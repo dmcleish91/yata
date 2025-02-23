@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router';
+import { Outlet, useNavigate } from 'react-router';
 import { useAuth } from '../libs/auth.context';
 import { useEffect, type ReactNode } from 'react';
 
@@ -12,5 +12,9 @@ export default function RequireAuth({ children }: { children: ReactNode }) {
     }
   }, [navigate]);
 
-  return children;
+  if (!user) {
+    return null;
+  }
+
+  return <Outlet />;
 }

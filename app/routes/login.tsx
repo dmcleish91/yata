@@ -1,17 +1,35 @@
 import { useState, type FormEvent } from 'react';
+import { useNavigate } from 'react-router';
+import { toast } from 'sonner';
+import { useAuth } from '~/libs/auth.context';
 
 export default function Login() {
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = (e: FormEvent) => {
+  const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    const statusCode = await login({ email, password });
 
-    // Simulate login request
-    setTimeout(() => {
-      setLoading(false);
-      alert('Login successful!');
-    }, 1500);
+    if (statusCode === 200) {
+      navigate('/app');
+    } else {
+      toast.error('Need a beter login error message');
+    }
+
+    setLoading(false);
+  };
+
+  const handleEmailInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+  };
+
+  const handlePasswordInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
   };
 
   return (
@@ -27,6 +45,8 @@ export default function Login() {
               type='email'
               placeholder='Enter your email'
               className='input input-bordered'
+              value={email}
+              onChange={handleEmailInput}
               required
             />
           </div>
@@ -38,13 +58,12 @@ export default function Login() {
               type='password'
               placeholder='Enter your password'
               className='input input-bordered'
+              value={password}
+              onChange={handlePasswordInput}
               required
             />
           </div>
-          <button
-            type='submit'
-            className={`btn btn-primary w-full ${loading ? 'loading' : ''}`}
-            disabled={loading}>
+          <button type='submit' className={`btn btn-primary w-full`} disabled={loading}>
             {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>

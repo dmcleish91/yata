@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react';
 
-export function Login() {
+export default function Login() {
   const [loading, setLoading] = useState(false);
 
   const handleLogin = (e: FormEvent) => {

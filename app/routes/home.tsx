@@ -1,5 +1,5 @@
-import { Login } from '~/login/login';
 import type { Route } from './+types/home';
+import TodoApp from './app';
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -9,5 +9,5 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Home() {
-  return <Login />;
+  return <TodoApp />;
 }

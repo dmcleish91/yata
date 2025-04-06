@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const ax = axios.create({
-  baseURL: 'https://go-todo-api-isvv.onrender.com',
+  baseURL: import.meta.env.VITE_BASEURL,
 });
 
 export default ax;

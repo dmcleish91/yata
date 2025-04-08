@@ -1,4 +1,3 @@
-import type { AxiosResponse } from 'axios';
 import React from 'react';
 import useSWR from 'swr';
 import ax from '~/libs/client';

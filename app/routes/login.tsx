@@ -4,25 +4,21 @@ import { toast } from 'sonner';
 import { useAuth } from '~/libs/auth.context';
 
 export default function Login() {
-  const { login } = useAuth();
+  const { login, error, isLoading } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
 
-  const handleLogin = async (e: FormEvent) => {
+  async function handleLogin(e: FormEvent) {
     e.preventDefault();
-    setLoading(true);
-    const statusCode = await login({ email, password });
 
-    if (statusCode === 200) {
+    try {
+      await login({ email, password });
       navigate('/app');
-    } else {
-      toast.error('Need a beter login error message');
+    } catch (err) {
+      console.log(err);
     }
-
-    setLoading(false);
-  };
+  }
 
   const handleEmailInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
@@ -36,6 +32,11 @@ export default function Login() {
     <main className='flex items-center justify-center min-h-screen bg-base-200'>
       <div className='card w-96 bg-base-100 shadow-xl p-8'>
         <h2 className='text-center text-2xl font-semibold'>Login</h2>
+        {error && (
+          <div className='alert alert-error my-4'>
+            <span>{error.message}</span>
+          </div>
+        )}
         <form className='space-y-4' onSubmit={handleLogin}>
           <div className='form-control'>
             <label className='label'>
@@ -45,6 +46,7 @@ export default function Login() {
               type='email'
               placeholder='Enter your email'
               className='input input-bordered'
+              // autoComplete='email'
               value={email}
               onChange={handleEmailInput}
               required
@@ -58,13 +60,14 @@ export default function Login() {
               type='password'
               placeholder='Enter your password'
               className='input input-bordered'
+              //autoComplete='current-password'
               value={password}
               onChange={handlePasswordInput}
               required
             />
           </div>
-          <button type='submit' className={`btn btn-primary w-full`} disabled={loading}>
-            {loading ? 'Logging in...' : 'Login'}
+          <button type='submit' className={`btn btn-primary w-full`} disabled={isLoading}>
+            {isLoading ? 'Logging in...' : 'Login'}
           </button>
         </form>
         <div className='text-center mt-4'>

@@ -5,12 +5,14 @@ import { useTodos } from '~/hooks/useTodos';
 export default function TodoApp() {
   const {
     todos,
-    newTodo,
-    setNewTodo,
+    todo,
+    editTodoID,
+    setTodo,
     handleToggleTodo,
     handleAddTodo,
     handleDeleteTodo,
     handleEditTodo,
+    clearEditAndResetTodo,
   } = useTodos();
 
   const [currentPage, setCurrentPage] = React.useState<number>(1);
@@ -24,12 +26,18 @@ export default function TodoApp() {
 
   return (
     <main className='flex items-center justify-center min-h-screen bg-base-200'>
-      <div className='card w-4/5 lg:w-2/4 bg-base-100 shadow-xl p-8 flex flex-col lg:flex-row'>
+      <div className='card w-4/5 lg:w-2/4 bg-base-100 lg:h-[450px] shadow-xl p-8 flex flex-col lg:flex-row'>
         <div className='flex flex-col lg:w-1/2 lg:border-r pr-4'>
           <h2 className='text-center text-2xl font-semibold mb-2'>Todos</h2>
           <ul className='list space-y-2 flex-grow'>
             {currentTodos.map((todo) => (
-              <TodoItem key={todo.todo_id} todo={todo} onToggle={handleToggleTodo} />
+              <TodoItem
+                key={todo.todo_id}
+                todo={todo}
+                onToggle={handleToggleTodo}
+                editTodo={handleEditTodo}
+                deleteTodo={handleDeleteTodo}
+              />
             ))}
           </ul>
           <div className='mt-2 flex justify-center'>
@@ -48,22 +56,11 @@ export default function TodoApp() {
               </div>
             )}
           </div>
-          <div className='mt-2 flex gap-1'>
-            <button
-              className='btn btn-primary w-1/3'
-              onClick={() => alert('Add not implemented')}>
-              Add
-            </button>
-            <button className='btn btn-secondary w-1/3' onClick={() => handleEditTodo(1)}>
-              Edit
-            </button>
-            <button className='btn btn-error w-1/3' onClick={() => handleDeleteTodo(1)}>
-              Delete
-            </button>
-          </div>
         </div>
         <div className='lg:w-1/2 lg:pl-4 mt-4 lg:mt-0 flex flex-col'>
-          <h2 className='text-center text-2xl font-semibold mb-2'>Add Todo</h2>
+          <h2 className='text-center text-2xl font-semibold mb-2'>
+            {editTodoID ? 'Edit Todo' : 'Add Todo'}
+          </h2>
           <form className='flex flex-col justify-between h-full' onSubmit={handleAddTodo}>
             <div className='form-control flex justify-between'>
               <label className='label'>
@@ -73,8 +70,8 @@ export default function TodoApp() {
                 type='text'
                 placeholder='Enter title'
                 className='input input-bordered'
-                value={newTodo.title}
-                onChange={(e) => setNewTodo({ ...newTodo, title: e.target.value })}
+                value={todo.title}
+                onChange={(e) => setTodo({ ...todo, title: e.target.value })}
                 required
               />
             </div>
@@ -85,8 +82,8 @@ export default function TodoApp() {
               <textarea
                 className='textarea textarea-bordered'
                 placeholder='Enter description'
-                value={newTodo.description}
-                onChange={(e) => setNewTodo({ ...newTodo, description: e.target.value })}
+                value={todo.description}
+                onChange={(e) => setTodo({ ...todo, description: e.target.value })}
                 required></textarea>
             </div>
             <div className='form-control  flex justify-between'>
@@ -96,8 +93,8 @@ export default function TodoApp() {
               <input
                 type='date'
                 className='input input-bordered'
-                value={newTodo.due_date}
-                onChange={(e) => setNewTodo({ ...newTodo, due_date: e.target.value })}
+                value={todo.due_date}
+                onChange={(e) => setTodo({ ...todo, due_date: e.target.value })}
                 required
               />
             </div>
@@ -115,9 +112,21 @@ export default function TodoApp() {
                 }
               />
             </div> */}
-            <button type='submit' className='btn btn-primary w-full'>
-              Add Todo
-            </button>
+            <div className='flex flex-row gap-2'>
+              <button
+                type='submit'
+                className={`btn btn-success ${editTodoID ? 'w-3/4' : 'w-full'}`}>
+                {editTodoID ? 'Edit Todo' : 'Add Todo'}
+              </button>
+              {editTodoID && (
+                <button
+                  type='button'
+                  className={'btn btn-error w-1/4'}
+                  onClick={clearEditAndResetTodo}>
+                  Cancel Edit
+                </button>
+              )}
+            </div>
           </form>
         </div>
       </div>

@@ -1,23 +1,31 @@
 import React from 'react';
+import { toast } from 'sonner';
 import useSWR from 'swr';
 import ax from '~/libs/client';
 
-interface Todo {
+type APIResponse<T> = {
+  message: string;
+  data: T;
+};
+
+export type Todo = {
   todo_id: number;
   title: string;
   description: string;
   is_completed: boolean;
   due_date: string;
   tags: string[];
-}
+};
 
-interface NewTodo extends Omit<Todo, 'todo_id' | 'is_completed' | 'tags'> {}
+type NewTodo = Omit<Todo, 'is_completed' | 'tags'>;
 
 export function useTodos() {
   const { data, error, isLoading } = useSWR(`/v1/todos`, fetchTodos);
 
   const [todos, setTodos] = React.useState<Todo[]>([]);
-  const [newTodo, setNewTodo] = React.useState<NewTodo>({
+  const [editTodoID, setEditTodoID] = React.useState<number | null>(null);
+  const [todo, setTodo] = React.useState<NewTodo>({
+    todo_id: -1,
     title: '',
     description: '',
     due_date: '',
@@ -39,41 +47,78 @@ export function useTodos() {
 
   async function handleAddTodo(e: React.FormEvent) {
     e.preventDefault();
-
     const payload: NewTodo = {
-      title: newTodo.title,
-      description: newTodo.description,
-      due_date: new Date(newTodo.due_date).toISOString(),
+      todo_id: editTodoID || -1,
+      title: todo.title,
+      description: todo.description,
+      due_date: new Date(todo.due_date).toISOString(),
     };
 
-    try {
-      const createdTodo = await createTodo(payload);
-      setTodos([...todos, createdTodo]);
-      setNewTodo({ title: '', description: '', due_date: '' });
-    } catch (error) {
-      console.error('Failed to add todo:', error);
+    if (editTodoID) {
+      const response = await editTodo(payload);
+      const updatedTodo = response.data;
+      const updatedTodos = todos.map((todo) =>
+        todo.todo_id === updatedTodo.todo_id ? updatedTodo : todo
+      );
+      setTodos(updatedTodos);
+      setEditTodoID(null);
+      setTodo({ todo_id: -1, title: '', description: '', due_date: '' });
+    } else {
+      try {
+        const createdTodo = await createTodo(payload);
+        setTodos([...todos, createdTodo]);
+        setTodo({ todo_id: -1, title: '', description: '', due_date: '' });
+      } catch (error) {
+        console.error('Failed to add todo:', error);
+      }
     }
   }
 
-  function handleDeleteTodo(id: number) {
-    setTodos((prevTodos) => prevTodos.filter((todo) => todo.todo_id !== id));
+  async function handleDeleteTodo(id: number) {
+    const wasSuccessful = await deleteTodo(id);
+    if (wasSuccessful) {
+      setTodos((prevTodos) => prevTodos.filter((todo) => todo.todo_id !== id));
+      toast.success('sucessfully deleted entry');
+    } else {
+      toast.error('error deleting todo');
+    }
+  }
+
+  function clearEditAndResetTodo() {
+    setEditTodoID(null);
+    setTodo({ todo_id: -1, title: '', description: '', due_date: '' });
   }
 
   function handleEditTodo(id: number) {
-    // Implement edit logic here
-    console.log(`Edit todo with id ${id}`);
+    const todoToEdit = todos.find((todo) => {
+      return id === todo.todo_id;
+    });
+
+    if (todoToEdit) {
+      setEditTodoID(id);
+      setTodo({
+        todo_id: id,
+        title: todoToEdit?.title,
+        description: todoToEdit?.description,
+        due_date: todoToEdit?.due_date.split('T')[0],
+      });
+    } else {
+      toast.error('Unable to edit todo');
+    }
   }
 
   return {
     todos,
     error,
     isLoading,
-    newTodo,
-    setNewTodo,
+    todo,
+    editTodoID,
+    setTodo,
     handleToggleTodo,
     handleAddTodo,
     handleDeleteTodo,
     handleEditTodo,
+    clearEditAndResetTodo,
   };
 }
 
@@ -85,4 +130,14 @@ async function fetchTodos(url: string) {
 async function createTodo(todo: NewTodo): Promise<Todo> {
   const response = await ax.post('/v1/todos', todo);
   return response.data;
+}
+
+async function editTodo(todo: NewTodo): Promise<APIResponse<Todo>> {
+  const response = await ax.post(`/v1/editTodo`, todo);
+  return response.data;
+}
+
+async function deleteTodo(todo_id: number): Promise<boolean> {
+  const response = await ax.delete(`/v1/todos?todo_id=${todo_id}`);
+  return response.data.rows_affected === 1;
 }

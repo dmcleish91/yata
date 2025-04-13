@@ -1,10 +1,9 @@
 import { useState, createContext, useContext, type ReactNode } from 'react';
-import ax from './client';
+import ax, { setAccessToken } from './client';
 import type { AxiosError } from 'axios';
 
 type User = {
   email: string;
-  token: string;
 };
 
 type AuthError = {
@@ -38,8 +37,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const response = await ax.post('/login', form);
 
       if (response.status === 200) {
-        ax.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
-        setUser({ email: data.email, token: response.data.token });
+        const { access_token } = response.data.data;
+        ax.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
+        setAccessToken(access_token);
+        setUser({ email: data.email });
       }
     } catch (err) {
       const error = err as AxiosError;

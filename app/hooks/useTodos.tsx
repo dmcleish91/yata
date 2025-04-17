@@ -1,3 +1,4 @@
+import type { AxiosResponse } from 'axios';
 import React from 'react';
 import { toast } from 'sonner';
 import useSWR from 'swr';
@@ -28,7 +29,7 @@ export function useTodos() {
     todo_id: -1,
     title: '',
     description: '',
-    due_date: '',
+    due_date: new Date().toISOString().split('T')[0],
   });
 
   React.useEffect(() => {
@@ -65,7 +66,8 @@ export function useTodos() {
       setTodo({ todo_id: -1, title: '', description: '', due_date: '' });
     } else {
       try {
-        const createdTodo = await createTodo(payload);
+        const response = await createTodo(payload);
+        const createdTodo = response.data;
         setTodos([...todos, createdTodo]);
         setTodo({ todo_id: -1, title: '', description: '', due_date: '' });
       } catch (error) {
@@ -127,13 +129,13 @@ async function fetchTodos(url: string) {
   return res.data;
 }
 
-async function createTodo(todo: NewTodo): Promise<Todo> {
+async function createTodo(todo: NewTodo): Promise<APIResponse<Todo>> {
   const response = await ax.post('/v1/todos', todo);
   return response.data;
 }
 
 async function editTodo(todo: NewTodo): Promise<APIResponse<Todo>> {
-  const response = await ax.post(`/v1/editTodo`, todo);
+  const response = await ax.post<APIResponse<Todo>>(`/v1/editTodo`, todo);
   return response.data;
 }
 

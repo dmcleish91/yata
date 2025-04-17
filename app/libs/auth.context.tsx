@@ -1,9 +1,10 @@
-import { useState, createContext, useContext, type ReactNode } from 'react';
+import { useState, createContext, useContext, type ReactNode, useEffect } from 'react';
 import ax, { setAccessToken } from './client';
 import type { AxiosError } from 'axios';
 
 type User = {
-  email: string;
+  isLoggedIn: boolean;
+  email?: string;
 };
 
 type AuthError = {
@@ -16,7 +17,9 @@ type AuthContextType = {
   error: AuthError | null;
   isLoading: boolean;
   login: (data: { email: string; password: string }) => Promise<void>;
+  setUser: (user: User | null) => void;
   logout: () => void;
+  refreshToken: () => Promise<string | null>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -31,22 +34,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoading(true);
       setError(null);
 
-      const form = new FormData();
-      form.append('email', data.email);
-      form.append('password', data.password);
-      const response = await ax.post('/login', form);
+      const payload = new URLSearchParams();
+      payload.append('email', data.email);
+      payload.append('password', data.password);
+
+      const response = await ax.post('/login', payload.toString(), {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      });
 
       if (response.status === 200) {
         const { access_token } = response.data.data;
         ax.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
         setAccessToken(access_token);
-        setUser({ email: data.email });
+        setUser({ isLoggedIn: true });
       }
     } catch (err) {
       const error = err as AxiosError;
       setError({
         message: error.message,
-        status: error.status || 500,
+        status: error.response?.status || 500,
       });
       throw error;
     } finally {
@@ -54,13 +62,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  function logout() {
+  async function logout() {
+    await ax.post('/v1/logout');
     delete ax.defaults.headers.common['Authorization'];
+    setAccessToken(null);
     setUser(null);
   }
 
+  async function refreshToken(): Promise<string | null> {
+    try {
+      const response = await ax.post('/refresh-token');
+
+      if (response.status === 200) {
+        const { access_token } = response.data.data;
+        ax.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
+        setUser({ isLoggedIn: true });
+        setAccessToken(access_token);
+        return access_token;
+      }
+      return null;
+    } catch (err) {
+      const error = err as AxiosError;
+      setError({
+        message: error.message,
+        status: error.response?.status || 500,
+      });
+      await logout();
+      return null;
+    }
+  }
+
   return (
-    <AuthContext.Provider value={{ user, error, isLoading, login, logout }}>
+    <AuthContext.Provider
+      value={{ user, setUser, error, isLoading, login, logout, refreshToken }}>
       {children}
     </AuthContext.Provider>
   );

@@ -2,6 +2,8 @@ import React from 'react';
 import TodoItem from './todoitem';
 import { useTodos } from '~/hooks/useTodos';
 
+const itemsPerPage = 4;
+
 export default function TodoApp() {
   const {
     todos,
@@ -16,12 +18,16 @@ export default function TodoApp() {
   } = useTodos();
 
   const [currentPage, setCurrentPage] = React.useState<number>(1);
-  const itemsPerPage = 4;
+
+  React.useEffect(() => {
+    if (todos.length <= itemsPerPage) {
+      setCurrentPage(1);
+    }
+  }, [todos]);
 
   const indexOfLastTodo = currentPage * itemsPerPage;
   const indexOfFirstTodo = indexOfLastTodo - itemsPerPage;
   const currentTodos = todos.slice(indexOfFirstTodo, indexOfLastTodo);
-
   const totalPages = Math.ceil(todos.length / itemsPerPage);
 
   return (

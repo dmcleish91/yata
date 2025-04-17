@@ -1,16 +1,23 @@
 import { Outlet, useNavigate } from 'react-router';
 import { useAuth } from '../libs/auth.context';
-import { useEffect, type ReactNode } from 'react';
+import { useEffect } from 'react';
 
-export default function RequireAuth({ children }: { children: ReactNode }) {
+export default function RequireAuth() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, refreshToken } = useAuth();
 
   useEffect(() => {
-    if (!user) {
-      navigate('/login');
+    async function checkAuth() {
+      if (!user) {
+        const token = await refreshToken();
+        if (!token) {
+          navigate('/login');
+        }
+      }
     }
-  }, [navigate]);
+
+    checkAuth();
+  }, [user, refreshToken, navigate]);
 
   if (!user) {
     return null;

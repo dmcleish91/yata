@@ -26,16 +26,23 @@ ax.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response.status === 401 && !originalRequest._retry) {
+    // Check if it's a 401 error, not a refresh token request, and hasn't been retried
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !originalRequest.url.includes('/refresh-token')
+    ) {
       originalRequest._retry = true;
 
       try {
-        const response = await ax.post('/v1/refresh');
+        const response = await ax.post('/v1/refresh-token');
         const { access_token } = response.data.data;
 
         setAccessToken(access_token);
         ax.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
 
+        // Update the original request with the new token
+        originalRequest.headers['Authorization'] = `Bearer ${access_token}`;
         return ax(originalRequest);
       } catch (refreshError) {
         await logout();
@@ -46,4 +53,5 @@ ax.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
 export default ax;

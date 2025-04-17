@@ -1,20 +1,39 @@
-import { useState, type FormEvent } from 'react';
+import { LoaderCircle } from 'lucide-react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router';
-import { toast } from 'sonner';
 import { useAuth } from '~/libs/auth.context';
 
 export default function Login() {
-  const { login, error, isLoading } = useAuth();
+  const { login, error, isLoading, refreshToken, user } = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [checking, setChecking] = useState<boolean>(true);
+
+  useEffect(() => {
+    async function checkRefreshToken() {
+      if (user) {
+        navigate('/');
+        return;
+      }
+
+      const token = await refreshToken();
+      if (token) {
+        navigate('/');
+      } else {
+        setChecking(false);
+      }
+    }
+    checkRefreshToken();
+  }, []);
 
   async function handleLogin(e: FormEvent) {
     e.preventDefault();
 
+    console.log({ email, password });
     try {
       await login({ email, password });
-      navigate('/app');
+      navigate('/');
     } catch (err) {
       console.log(err);
     }
@@ -27,6 +46,14 @@ export default function Login() {
   const handlePasswordInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
   };
+
+  if (checking) {
+    return (
+      <main className='flex items-center justify-center min-h-screen bg-base-200'>
+        <LoaderCircle className='animate-spin' />
+      </main>
+    );
+  }
 
   return (
     <main className='flex items-center justify-center min-h-screen bg-base-200'>

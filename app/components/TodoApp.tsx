@@ -33,37 +33,7 @@ export default function TodoApp() {
   return (
     <main className='flex items-center justify-center min-h-screen bg-base-200'>
       <div className='card w-4/5 lg:w-2/4 bg-base-100 lg:h-[450px] shadow-xl p-8 flex flex-col lg:flex-row'>
-        <div className='flex flex-col lg:w-1/2 lg:border-r pr-4'>
-          <h2 className='text-center text-2xl font-semibold mb-2'>Todos</h2>
-          <ul className='list space-y-2 flex-grow'>
-            {currentTodos.map((todo) => (
-              <TodoItem
-                key={todo.todo_id}
-                todo={todo}
-                onToggle={handleToggleTodo}
-                editTodo={handleEditTodo}
-                deleteTodo={handleDeleteTodo}
-              />
-            ))}
-          </ul>
-          <div className='mt-2 flex justify-center'>
-            {totalPages > 1 && (
-              <div className='join'>
-                {Array.from({ length: totalPages }, (_, index) => (
-                  <button
-                    key={index + 1}
-                    className={`join-item btn ${
-                      currentPage === index + 1 ? 'btn-active' : ''
-                    }`}
-                    onClick={() => setCurrentPage(index + 1)}>
-                    {index + 1}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-        <div className='lg:w-1/2 lg:pl-4 mt-4 lg:mt-0 flex flex-col'>
+        <div className='lg:w-1/2 lg:pr-4 mt-4 lg:mt-0 flex flex-col'>
           <h2 className='text-center text-2xl font-semibold mb-2'>
             {editTodoID ? 'Edit Todo' : 'Add Todo'}
           </h2>
@@ -134,6 +104,36 @@ export default function TodoApp() {
               )}
             </div>
           </form>
+        </div>
+        <div className='flex flex-col lg:w-1/2 lg:border-l pl-4'>
+          <h2 className='text-center text-2xl font-semibold mb-2'>Todos</h2>
+          <ul className='list space-y-2 flex-grow'>
+            {currentTodos.map((todo) => (
+              <TodoItem
+                key={todo.todo_id}
+                todo={todo}
+                onToggle={handleToggleTodo}
+                editTodo={handleEditTodo}
+                deleteTodo={handleDeleteTodo}
+              />
+            ))}
+          </ul>
+          <div className='mt-2 flex justify-center'>
+            {totalPages > 1 && (
+              <div className='join'>
+                {Array.from({ length: totalPages }, (_, index) => (
+                  <button
+                    key={index + 1}
+                    className={`join-item btn ${
+                      currentPage === index + 1 ? 'btn-active' : ''
+                    }`}
+                    onClick={() => setCurrentPage(index + 1)}>
+                    {index + 1}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </main>

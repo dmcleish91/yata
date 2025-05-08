@@ -34,7 +34,7 @@ export default function Login() {
   useEffect(() => {
     async function checkAuth() {
       try {
-        const refreshed = await refreshToken(); // Assuming this function exists in your auth context
+        const refreshed = await refreshToken();
         if (refreshed) {
           navigate('/');
         } else {

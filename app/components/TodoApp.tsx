@@ -31,7 +31,7 @@ export default function TodoApp() {
   const totalPages = Math.ceil(todos.length / itemsPerPage);
 
   return (
-    <main className='flex items-center justify-center min-h-screen bg-base-200'>
+    <main className='flex items-center justify-center h-full bg-base-200'>
       <div className='card w-4/5 lg:w-2/4 bg-base-100 lg:h-[450px] shadow-xl p-8 flex flex-col lg:flex-row'>
         <div className='lg:w-1/2 lg:pr-4 mt-4 lg:mt-0 flex flex-col'>
           <h2 className='text-center text-2xl font-semibold mb-2'>

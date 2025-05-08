@@ -1,37 +1,21 @@
 import { LoaderCircle } from 'lucide-react';
-import { useEffect, useState, type FormEvent } from 'react';
+import { useState, useEffect, type FormEvent } from 'react';
 import { useNavigate } from 'react-router';
 import { useAuth } from '~/libs/auth.context';
 
 export default function Login() {
-  const { login, error, isLoading, refreshToken, user } = useAuth();
+  const { login, error, isLoading, refreshToken } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const [checking, setChecking] = useState<boolean>(true);
-
-  useEffect(() => {
-    async function checkRefreshToken() {
-      if (user) {
-        navigate('/');
-        return;
-      }
-
-      const token = await refreshToken();
-      if (token) {
-        navigate('/');
-      } else {
-        setChecking(false);
-      }
-    }
-    checkRefreshToken();
-  }, []);
+  const [checking, setIsChecking] = useState<boolean>(true);
 
   async function handleLogin(e: FormEvent) {
     e.preventDefault();
 
     console.log({ email, password });
     try {
+      console.log('attempting Login');
       await login({ email, password });
       navigate('/');
     } catch (err) {
@@ -46,6 +30,24 @@ export default function Login() {
   const handlePasswordInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
   };
+
+  useEffect(() => {
+    async function checkAuth() {
+      try {
+        const refreshed = await refreshToken(); // Assuming this function exists in your auth context
+        if (refreshed) {
+          navigate('/');
+        } else {
+          setIsChecking(false);
+        }
+      } catch (err) {
+        console.error('Error refreshing token:', err);
+        setIsChecking(false);
+      }
+    }
+
+    checkAuth();
+  }, [navigate]);
 
   if (checking) {
     return (

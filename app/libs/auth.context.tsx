@@ -1,6 +1,7 @@
 import { useState, createContext, useContext, type ReactNode, useEffect } from 'react';
 import ax, { setAccessToken } from './client';
 import type { AxiosError } from 'axios';
+import axios from 'axios';
 
 type User = {
   isLoggedIn: boolean;
@@ -63,7 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   async function logout() {
-    await ax.post('/v1/logout');
+    await axios.post(import.meta.env.VITE_BASEURL + '/logout');
     delete ax.defaults.headers.common['Authorization'];
     setAccessToken(null);
     setUser(null);
@@ -83,10 +84,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return null;
     } catch (err) {
       const error = err as AxiosError;
-      setError({
-        message: error.message,
-        status: error.response?.status || 500,
-      });
+      console.log(error);
       await logout();
       return null;
     }

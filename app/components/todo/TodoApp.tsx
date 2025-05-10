@@ -32,7 +32,7 @@ export default function TodoApp() {
 
   return (
     <main className='flex items-center justify-center h-full bg-base-200'>
-      <div className='card w-4/5 xl:w-2/4 bg-base-100 xl:h-[450px] shadow-xl p-8 flex flex-col-reverse xl:flex-row'>
+      <div className='card w-3/5 bg-base-100 xl:h-[450px] shadow-xl p-8 flex flex-col-reverse xl:flex-row'>
         <div className='xl:w-1/2 xl:pr-4 mt-4 xl:mt-0 flex flex-col'>
           <h2 className='text-center text-2xl font-semibold mb-2'>
             {editTodoID ? 'Edit Todo' : 'Add Todo'}

@@ -2,6 +2,7 @@ import { LoaderCircle } from 'lucide-react';
 import { useState, useEffect, type FormEvent } from 'react';
 import { useNavigate } from 'react-router';
 import { useAuth } from '~/libs/auth/AuthContext';
+import { handleError } from '~/libs/handleError';
 
 export default function Login() {
   const { login, error, isLoading, refreshToken } = useAuth();
@@ -13,13 +14,11 @@ export default function Login() {
   async function handleLogin(e: FormEvent) {
     e.preventDefault();
 
-    console.log({ email, password });
     try {
-      console.log('attempting Login');
       await login({ email, password });
       navigate('/');
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      handleError(error);
     }
   }
 
@@ -40,8 +39,8 @@ export default function Login() {
         } else {
           setIsChecking(false);
         }
-      } catch (err) {
-        console.error('Error refreshing token:', err);
+      } catch (error) {
+        handleError(error);
         setIsChecking(false);
       }
     }
@@ -75,7 +74,7 @@ export default function Login() {
               type='email'
               placeholder='Enter your email'
               className='input input-bordered'
-              // autoComplete='email'
+              autoComplete='email'
               value={email}
               onChange={handleEmailInput}
               required
@@ -89,7 +88,7 @@ export default function Login() {
               type='password'
               placeholder='Enter your password'
               className='input input-bordered'
-              //autoComplete='current-password'
+              autoComplete='current-password'
               value={password}
               onChange={handlePasswordInput}
               required

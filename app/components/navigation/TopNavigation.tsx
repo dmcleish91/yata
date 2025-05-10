@@ -24,15 +24,15 @@ export default function TopNavigation({ children }: { children: React.ReactNode 
             Yet Another Todo App 😒
           </Link>
           <div className='space-x-4'>
-            <Link to='/about' className='btn btn-ghost'>
-              About
-            </Link>
             {user?.isLoggedIn ? (
               <button onClick={handleLogout} className='btn btn-ghost'>
                 Logout
               </button>
             ) : (
               <>
+                <Link to='/about' className='btn btn-ghost'>
+                  About
+                </Link>
                 <Link to='/register' className='btn btn-ghost'>
                   Register
                 </Link>

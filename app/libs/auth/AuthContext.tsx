@@ -2,6 +2,7 @@ import { useState, createContext, useContext, type ReactNode, useEffect } from '
 import type { AxiosError } from 'axios';
 import ax, { setAccessToken } from '../client';
 import type { AuthError, User } from '~/types/auth';
+import { handleError } from '../handleError';
 
 type AuthContextType = {
   user: User | null;
@@ -73,9 +74,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return access_token;
       }
       return null;
-    } catch (err) {
-      const error = err as AxiosError;
-      console.log(error);
+    } catch (error) {
+      handleError(error);
       await logout();
       return null;
     }

@@ -32,8 +32,8 @@ export default function TodoApp() {
 
   return (
     <main className='flex items-center justify-center h-full bg-base-200'>
-      <div className='card w-4/5 lg:w-2/4 bg-base-100 lg:h-[450px] shadow-xl p-8 flex flex-col lg:flex-row'>
-        <div className='lg:w-1/2 lg:pr-4 mt-4 lg:mt-0 flex flex-col'>
+      <div className='card w-4/5 xl:w-2/4 bg-base-100 xl:h-[450px] shadow-xl p-8 flex flex-col-reverse xl:flex-row'>
+        <div className='xl:w-1/2 xl:pr-4 mt-4 xl:mt-0 flex flex-col'>
           <h2 className='text-center text-2xl font-semibold mb-2'>
             {editTodoID ? 'Edit Todo' : 'Add Todo'}
           </h2>
@@ -74,20 +74,6 @@ export default function TodoApp() {
                 required
               />
             </div>
-            {/* <div className='form-control flex flex-row'>
-              <label className='label mb-2'>
-                <span className='label-text'>Tags (comma separated)</span>
-              </label>
-              <input
-                type='text'
-                placeholder='Enter tags'
-                className='input input-bordered ml-auto'
-                value={newTodo.tags.join(' ')}
-                onChange={(e) =>
-                  setNewTodo({ ...newTodo, tags: e.target.value.split(' ') })
-                }
-              />
-            </div> */}
             <div className='flex flex-row gap-2'>
               <button
                 type='submit'
@@ -105,7 +91,7 @@ export default function TodoApp() {
             </div>
           </form>
         </div>
-        <div className='flex flex-col lg:w-1/2 lg:border-l pl-4'>
+        <div className='flex flex-col xl:w-1/2 xl:border-l pl-4'>
           <h2 className='text-center text-2xl font-semibold mb-2'>Todos</h2>
           <ul className='list space-y-2 flex-grow'>
             {currentTodos.map((todo) => (

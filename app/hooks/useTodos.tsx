@@ -1,12 +1,14 @@
-import type { AxiosResponse } from 'axios';
 import React from 'react';
 import { toast } from 'sonner';
 import useSWR from 'swr';
 import { APIEndpoints } from '~/constants/api';
-import { createResource, deleteResource, editResource, fetchData } from '~/libs/api';
-import ax from '~/libs/client';
+import {
+  createResource,
+  deleteResource,
+  editResource,
+  fetchData,
+} from '~/libs/httpMethods';
 import { handleError } from '~/libs/handleError';
-import type { APIResponse } from '~/types/auth';
 import type { NewTodo, Todo } from '~/types/todo';
 
 export function useTodos() {

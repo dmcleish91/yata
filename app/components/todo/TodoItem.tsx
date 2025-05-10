@@ -13,9 +13,9 @@ function TodoItem({ todo, editTodo, deleteTodo, onToggle }: TodoItemProps) {
       className='list-row cursor-pointer flex justify-between items-center'
       onClick={() => onToggle(todo.todo_id!)}>
       <span className={todo.is_completed ? 'line-through' : ''}>{todo.title}</span>
-      <div className='space-x-2'>
+      <div className='flex flex-row gap-2 w-24 flex-wrap 2xl:flex-nowrap 2xl:w-52'>
         <button
-          className='btn btn-sm btn-info w-24'
+          className='btn btn-xs 2xl:btn-sm btn-info w-24'
           onClick={(e) => {
             e.stopPropagation();
             editTodo(todo.todo_id);
@@ -23,7 +23,7 @@ function TodoItem({ todo, editTodo, deleteTodo, onToggle }: TodoItemProps) {
           EDIT
         </button>
         <button
-          className='btn btn-sm btn-secondary w-24'
+          className='btn btn-xs 2xl:btn-sm btn-secondary w-24'
           onClick={(e) => {
             e.stopPropagation();
             deleteTodo(todo.todo_id);

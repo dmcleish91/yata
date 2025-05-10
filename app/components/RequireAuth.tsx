@@ -1,6 +1,6 @@
 import { Outlet, useNavigate } from 'react-router';
-import { useAuth } from '../libs/auth.context';
 import { useEffect } from 'react';
+import { useAuth } from '~/libs/auth/AuthContext';
 
 export default function RequireAuth() {
   const navigate = useNavigate();

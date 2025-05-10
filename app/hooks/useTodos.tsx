@@ -2,26 +2,15 @@ import type { AxiosResponse } from 'axios';
 import React from 'react';
 import { toast } from 'sonner';
 import useSWR from 'swr';
+import { APIEndpoints } from '~/constants/api';
+import { createResource, deleteResource, editResource, fetchData } from '~/libs/api';
 import ax from '~/libs/client';
-
-type APIResponse<T> = {
-  message: string;
-  data: T;
-};
-
-export type Todo = {
-  todo_id: number;
-  title: string;
-  description: string;
-  is_completed: boolean;
-  due_date: string;
-  tags: string[];
-};
-
-type NewTodo = Omit<Todo, 'is_completed' | 'tags'>;
+import { handleError } from '~/libs/handleError';
+import type { APIResponse } from '~/types/auth';
+import type { NewTodo, Todo } from '~/types/todo';
 
 export function useTodos() {
-  const { data, error, isLoading } = useSWR(`/v1/todos`, fetchTodos);
+  const { data, error, isLoading } = useSWR(APIEndpoints.TODOS, fetchData<Todo[]>);
 
   const [todos, setTodos] = React.useState<Todo[]>([]);
   const [editTodoID, setEditTodoID] = React.useState<number | null>(null);
@@ -56,7 +45,10 @@ export function useTodos() {
     };
 
     if (editTodoID) {
-      const response = await editTodo(payload);
+      const response = await editResource<NewTodo, Todo>(
+        APIEndpoints.EDIT_TODOS,
+        payload
+      );
       const updatedTodo = response.data;
       const updatedTodos = todos.map((todo) =>
         todo.todo_id === updatedTodo.todo_id ? updatedTodo : todo
@@ -66,18 +58,18 @@ export function useTodos() {
       setTodo({ todo_id: -1, title: '', description: '', due_date: '' });
     } else {
       try {
-        const response = await createTodo(payload);
+        const response = await createResource<NewTodo, Todo>(APIEndpoints.TODOS, payload);
         const createdTodo = response.data;
         setTodos([...todos, createdTodo]);
         setTodo({ todo_id: -1, title: '', description: '', due_date: '' });
       } catch (error) {
-        console.error('Failed to add todo:', error);
+        handleError(error);
       }
     }
   }
 
   async function handleDeleteTodo(id: number) {
-    const wasSuccessful = await deleteTodo(id);
+    const wasSuccessful = await deleteResource(APIEndpoints.DELETE_TODOS(id));
     if (wasSuccessful) {
       setTodos((prevTodos) => prevTodos.filter((todo) => todo.todo_id !== id));
       toast.success('sucessfully deleted entry');
@@ -122,24 +114,4 @@ export function useTodos() {
     handleEditTodo,
     clearEditAndResetTodo,
   };
-}
-
-async function fetchTodos(url: string) {
-  const res = await ax.get(url);
-  return res.data;
-}
-
-async function createTodo(todo: NewTodo): Promise<APIResponse<Todo>> {
-  const response = await ax.post('/v1/todos', todo);
-  return response.data;
-}
-
-async function editTodo(todo: NewTodo): Promise<APIResponse<Todo>> {
-  const response = await ax.post<APIResponse<Todo>>(`/v1/editTodo`, todo);
-  return response.data;
-}
-
-async function deleteTodo(todo_id: number): Promise<boolean> {
-  const response = await ax.delete(`/v1/todos?todo_id=${todo_id}`);
-  return response.data.rows_affected === 1;
 }

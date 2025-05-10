@@ -1,7 +1,7 @@
 import { LoaderCircle } from 'lucide-react';
 import { useState, useEffect, type FormEvent } from 'react';
 import { useNavigate } from 'react-router';
-import { useAuth } from '~/libs/auth.context';
+import { useAuth } from '~/libs/auth/AuthContext';
 
 export default function Login() {
   const { login, error, isLoading, refreshToken } = useAuth();

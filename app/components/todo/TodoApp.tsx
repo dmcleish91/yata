@@ -1,6 +1,6 @@
 import React from 'react';
-import TodoItem from './todoitem';
 import { useTodos } from '~/hooks/useTodos';
+import TodoItem from './TodoItem';
 
 const itemsPerPage = 4;
 

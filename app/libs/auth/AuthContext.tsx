@@ -1,17 +1,7 @@
 import { useState, createContext, useContext, type ReactNode, useEffect } from 'react';
-import ax, { setAccessToken } from './client';
 import type { AxiosError } from 'axios';
-import axios from 'axios';
-
-type User = {
-  isLoggedIn: boolean;
-  email?: string;
-};
-
-type AuthError = {
-  message: string;
-  status: number;
-};
+import ax, { setAccessToken } from '../client';
+import type { AuthError, User } from '~/types/auth';
 
 type AuthContextType = {
   user: User | null;
@@ -19,7 +9,7 @@ type AuthContextType = {
   isLoading: boolean;
   login: (data: { email: string; password: string }) => Promise<void>;
   setUser: (user: User | null) => void;
-  logout: () => void;
+  logout: () => Promise<string | null>;
   refreshToken: () => Promise<string | null>;
 };
 
@@ -55,7 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const error = err as AxiosError;
       setError({
         message: error.message,
-        status: error.response?.status || 500,
+        code: error.response?.status || 500,
       });
       throw error;
     } finally {
@@ -63,11 +53,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  async function logout() {
-    await axios.post(import.meta.env.VITE_BASEURL + '/logout');
+  async function logout(): Promise<string | null> {
+    const response = await ax.post(import.meta.env.VITE_BASEURL + '/logout');
     delete ax.defaults.headers.common['Authorization'];
     setAccessToken(null);
     setUser(null);
+    return response.data;
   }
 
   async function refreshToken(): Promise<string | null> {

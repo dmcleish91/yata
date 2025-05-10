@@ -39,6 +39,7 @@ export default function Register() {
               placeholder='Enter your email'
               className='input input-bordered'
               required
+              autoComplete='off'
             />
           </div>
           <div className='form-control'>
@@ -50,6 +51,7 @@ export default function Register() {
               placeholder='Enter your password'
               className='input input-bordered'
               required
+              autoComplete='off'
             />
           </div>
           <button

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { handleError } from './handleError';
 
 let authToken: string | null = null;
 
@@ -17,7 +18,7 @@ export const logout = async () => {
     setAccessToken(null);
     delete ax.defaults.headers.common['Authorization'];
   } catch (error) {
-    console.error('Logout failed:', error);
+    handleError(error);
   }
 };
 

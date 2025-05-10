@@ -9,9 +9,9 @@ import {
 
 import type { Route } from './+types/root';
 import './app.css';
-import { AuthProvider } from './libs/auth.context';
 import { Toaster } from 'sonner';
-import TopNavigation from './components/TopNavigation';
+import TopNavigation from './components/navigation/TopNavigation';
+import { AuthProvider } from './libs/auth/AuthContext';
 
 export const links: Route.LinksFunction = () => [
   { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
@@ -36,7 +36,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body className='h-full flex flex-col'>
-        <TopNavigation>{children}</TopNavigation>
+        {children}
         <ScrollRestoration />
         <Scripts />
       </body>
@@ -47,7 +47,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
 export default function App() {
   return (
     <AuthProvider>
-      <Outlet />
+      <TopNavigation>
+        <Outlet />
+      </TopNavigation>
       <Toaster richColors />
     </AuthProvider>
   );

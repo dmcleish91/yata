@@ -1,7 +1,7 @@
-import type { Todo } from '~/hooks/useTodos';
+import type { TodoPreview } from '~/types/todo';
 
 type TodoItemProps = {
-  todo: Todo;
+  todo: TodoPreview;
   onToggle: (id: number) => void;
   editTodo: (id: number) => void;
   deleteTodo: (id: number) => void;

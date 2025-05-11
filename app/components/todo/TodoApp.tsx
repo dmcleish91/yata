@@ -32,20 +32,22 @@ export default function TodoApp() {
 
   return (
     <main className='flex items-center justify-center h-full bg-base-200'>
-      <div className='card w-3/5 bg-base-100 xl:h-[450px] shadow-xl p-8 flex flex-col-reverse xl:flex-row'>
+      <div className='card w-5/6 lg:w-3/5 xl:w-3/5 2xl:w-2/5 bg-base-100 xl:h-[450px] shadow-xl p-8 flex flex-col-reverse xl:flex-row'>
         <div className='xl:w-1/2 xl:pr-4 mt-4 xl:mt-0 flex flex-col'>
           <h2 className='text-center text-2xl font-semibold mb-2'>
             {editTodoID ? 'Edit Todo' : 'Add Todo'}
           </h2>
-          <form className='flex flex-col justify-between h-full' onSubmit={handleAddTodo}>
+          <form
+            className='flex flex-col justify-between h-full gap-4'
+            onSubmit={handleAddTodo}>
             <div className='form-control flex justify-between'>
               <label className='label'>
-                <span className='label-text'>Title</span>
+                <span className='label-text 2xl:hidden'>Title</span>
               </label>
               <input
                 type='text'
                 placeholder='Enter title'
-                className='input input-bordered'
+                className='input input-bordered w-48 md:w-60 lg:w-64 xl:w-48 2xl:w-full'
                 value={todo.title}
                 onChange={(e) => setTodo({ ...todo, title: e.target.value })}
                 required
@@ -53,10 +55,10 @@ export default function TodoApp() {
             </div>
             <div className='form-control flex justify-between'>
               <label className='label'>
-                <span className='label-text'>Description</span>
+                <span className='label-text 2xl:hidden'>Description</span>
               </label>
               <textarea
-                className='textarea textarea-bordered'
+                className='textarea textarea-bordered w-48 md:w-60 lg:w-64 xl:w-48 2xl:w-full'
                 placeholder='Enter description'
                 value={todo.description}
                 onChange={(e) => setTodo({ ...todo, description: e.target.value })}
@@ -68,7 +70,7 @@ export default function TodoApp() {
               </label>
               <input
                 type='date'
-                className='input input-bordered'
+                className='input input-bordered w-48 md:w-60 lg:w-64 xl:w-48 2xl:w-72'
                 value={todo.due_date}
                 onChange={(e) => setTodo({ ...todo, due_date: e.target.value })}
                 required
@@ -91,8 +93,8 @@ export default function TodoApp() {
             </div>
           </form>
         </div>
-        <div className='flex flex-col xl:w-1/2 xl:border-l pl-4'>
-          <h2 className='text-center text-2xl font-semibold mb-2'>Todos</h2>
+        <div className='flex flex-col xl:w-1/2 xl:border-l'>
+          <h2 className='text-center text-2xl font-semibold mb-2 w-full'>Todos</h2>
           <ul className='list space-y-2 flex-grow'>
             {currentTodos.map((todo) => (
               <TodoItem

@@ -10,9 +10,14 @@ type TodoItemProps = {
 
 function TodoItem({ todo, editTodo, deleteTodo, onToggle }: TodoItemProps) {
   return (
-    <li className='list-row cursor-pointer flex justify-between items-center' onClick={() => onToggle(todo.todo_id!)}>
-      <span className={todo.is_completed ? 'line-through' : ''}>{todo.title}</span>
-      <div className='flex flex-row gap-2 flex-wrap 2xl:flex-nowrap'>
+    <li
+      className='list-row cursor-pointer flex justify-between items-center'
+      onClick={() => onToggle(todo.todo_id!)}>
+      <span
+        className={todo.is_completed ? 'line-through' : 'w-32 md:w-80 lg:w-96 2xl:w-fit'}>
+        {todo.title}
+      </span>
+      <div className='flex flex-row gap-2 flex-wrap 2xl:flex-nowrap min-w-22'>
         <button
           className='btn btn-square btn-primary'
           onClick={(e) => {

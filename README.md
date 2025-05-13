@@ -1,7 +1,20 @@
 # Todo App Checklist
 
-Welcome to the Yet Another Todo App! 🎯  
-Here's a checklist of the exciting features we're working on to enhance your productivity and collaboration experience:
+## About This Project
+
+Yet Another Todo App (YATA) was built to demonstrate clean and modern React application architecture.
+
+### Features of the Application
+
+- Secure authentication using JWT access and refresh tokens.
+- Maintainable architecture built with TypeScript.
+- Modern React codebase following best practices.
+- UI with opportunistic updates for enhanced performance.
+- Mobile-friendly, responsive design.
+
+---
+
+Here's a checklist 🎯 of the exciting features we're working on to enhance your productivity and collaboration experience:
 
 ---
 
@@ -64,4 +77,4 @@ Here's a checklist of the exciting features we're working on to enhance your pro
 Stay tuned for updates and new feature rollouts!  
 We’re building a better way to manage your tasks — one update at a time.
 
-🛠️ Built with ❤️ by the Todo App Team
+🛠️ Built with ❤️ by Dwight

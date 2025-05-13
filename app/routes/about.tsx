@@ -17,7 +17,7 @@ export default function About() {
           <div className='flex-1 grid grid-cols-1 md:grid-cols-2 gap-4'>
             <div className='card bg-base-300 shadow-md p-4'>
               <h2 className='text-xl font-semibold'>🚀 Features</h2>
-              <ul className='list-disc list-inside text-gray-600'>
+              <ul className='list-disc list-inside text-gray-600 text-sm'>
                 <li>Tag and categorize tasks</li>
                 <li>Set priorities and due dates</li>
                 <li>Recurring tasks</li>
@@ -25,7 +25,7 @@ export default function About() {
             </div>
             <div className='card bg-base-300 shadow-md p-4'>
               <h2 className='text-xl font-semibold'>📊 Insights</h2>
-              <ul className='list-disc list-inside text-gray-600'>
+              <ul className='list-disc list-inside text-gray-600 text-sm'>
                 <li>Track task completion</li>
                 <li>View weekly/monthly reports</li>
                 <li>Analyze productivity trends</li>
@@ -33,7 +33,7 @@ export default function About() {
             </div>
             <div className='card bg-base-300 shadow-md p-4'>
               <h2 className='text-xl font-semibold'>🌐 Collaboration</h2>
-              <ul className='list-disc list-inside text-gray-600'>
+              <ul className='list-disc list-inside text-gray-600 text-sm'>
                 <li>Share tasks with others</li>
                 <li>Real-time updates</li>
                 <li>Comment on tasks</li>
@@ -41,7 +41,7 @@ export default function About() {
             </div>
             <div className='card bg-base-300 shadow-md p-4'>
               <h2 className='text-xl font-semibold'>📱 Mobile-Friendly</h2>
-              <ul className='list-disc list-inside text-gray-600'>
+              <ul className='list-disc list-inside text-gray-600 text-sm'>
                 <li>Responsive design</li>
                 <li>Offline support</li>
                 <li>Installable as a PWA</li>

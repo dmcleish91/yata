@@ -1,7 +1,10 @@
-import { useState, type FormEvent } from 'react';
+import { useState, type ChangeEvent, type FormEvent } from 'react';
 
 export default function Register() {
   const [loading, setLoading] = useState(false);
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   const handleRegister = (e: FormEvent) => {
     e.preventDefault();
@@ -28,6 +31,8 @@ export default function Register() {
               placeholder='Enter your username'
               className='input input-bordered'
               required
+              value={username}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)}
             />
           </div>
           <div className='form-control'>
@@ -40,6 +45,8 @@ export default function Register() {
               className='input input-bordered'
               required
               autoComplete='off'
+              value={email}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
             />
           </div>
           <div className='form-control'>
@@ -52,6 +59,8 @@ export default function Register() {
               className='input input-bordered'
               required
               autoComplete='off'
+              value={password}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
             />
           </div>
           <button

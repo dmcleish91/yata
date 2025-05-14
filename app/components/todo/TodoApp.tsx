@@ -64,7 +64,7 @@ export default function TodoApp() {
                 onChange={(e) => setTodo({ ...todo, description: e.target.value })}
                 required></textarea>
             </div>
-            <div className='form-control  flex justify-between'>
+            <div className='form-control flex gap-2 justify-between'>
               <label className='label'>
                 <span className='label-text'>Due Date</span>
               </label>

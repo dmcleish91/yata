@@ -3,6 +3,7 @@ import type { AxiosError } from 'axios';
 import ax, { setAccessToken } from '../client';
 import type { AuthError, User } from '~/types/auth';
 import { handleError } from '../handleError';
+import { APIEndpoints } from '~/constants/api';
 
 type AuthContextType = {
   user: User | null;
@@ -30,7 +31,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       payload.append('email', data.email);
       payload.append('password', data.password);
 
-      const response = await ax.post('/login', payload.toString(), {
+      const response = await ax.post(APIEndpoints.LOGIN, payload.toString(), {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
@@ -55,7 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   async function logout(): Promise<string | null> {
-    const response = await ax.post(import.meta.env.VITE_BASEURL + '/logout');
+    const response = await ax.post(APIEndpoints.LOGOUT);
     delete ax.defaults.headers.common['Authorization'];
     setAccessToken(null);
     setUser(null);
@@ -64,7 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   async function refreshToken(): Promise<string | null> {
     try {
-      const response = await ax.post('/refresh-token');
+      const response = await ax.post(APIEndpoints.REFRESH_TOKEN);
 
       if (response.status === 200) {
         const { access_token } = response.data.data;

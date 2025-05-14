@@ -1,4 +1,8 @@
 import { useState, type ChangeEvent, type FormEvent } from 'react';
+import { toast } from 'sonner';
+import { APIEndpoints } from '~/constants/api';
+import ax from '~/libs/client';
+import { handleError } from '~/libs/handleError';
 
 export default function Register() {
   const [loading, setLoading] = useState(false);
@@ -6,16 +10,27 @@ export default function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleRegister = (e: FormEvent) => {
+  async function handleRegister(e: FormEvent) {
     e.preventDefault();
     setLoading(true);
 
-    // Simulate registration request
-    setTimeout(() => {
+    const payload = new URLSearchParams();
+    payload.append('username', username);
+    payload.append('email', email);
+    payload.append('password', password);
+
+    try {
+      await ax.post(APIEndpoints.REGISTER, payload.toString(), {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      });
+    } catch (error) {
+      handleError(error);
+    } finally {
       setLoading(false);
-      alert('Registration successful!');
-    }, 1500);
-  };
+    }
+  }
 
   return (
     <main className='flex items-center justify-center min-h-screen bg-base-200'>

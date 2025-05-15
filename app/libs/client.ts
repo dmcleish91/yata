@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { handleError } from './handleError';
+import { APIEndpoints } from '~/constants/api';
 
 let authToken: string | null = null;
 
@@ -14,7 +15,7 @@ export const setAccessToken = (token: string | null) => {
 
 export const logout = async () => {
   try {
-    await ax.post('/v1/logout');
+    await ax.post(APIEndpoints.LOGOUT);
     setAccessToken(null);
     delete ax.defaults.headers.common['Authorization'];
   } catch (error) {
@@ -31,12 +32,12 @@ ax.interceptors.response.use(
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&
-      !originalRequest.url.includes('/refresh-token')
+      !originalRequest.url.includes(APIEndpoints.REFRESH_TOKEN)
     ) {
       originalRequest._retry = true;
 
       try {
-        const response = await ax.post('/v1/refresh-token');
+        const response = await ax.post(APIEndpoints.REFRESH_TOKEN);
         const { access_token } = response.data.data;
 
         setAccessToken(access_token);

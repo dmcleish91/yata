@@ -9,6 +9,7 @@ export default function Register() {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [registrationSuccessful, setRegistrationSuccessful] = useState(false); // <-- new state
 
   async function handleRegister(e: FormEvent) {
     e.preventDefault();
@@ -25,11 +26,18 @@ export default function Register() {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
       });
+      setRegistrationSuccessful(true);
     } catch (error) {
       handleError(error);
     } finally {
       setLoading(false);
     }
+  }
+
+  if (registrationSuccessful) {
+    return (
+      <main className='flex items-center justify-center min-h-screen bg-base-200'></main>
+    );
   }
 
   return (

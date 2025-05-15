@@ -109,6 +109,8 @@ export default function Login() {
                 id='password'
                 type={passwordType}
                 placeholder='********'
+                value={password}
+                onChange={handlePasswordInput}
                 className='input input-bordered pr-11 w-full'
               />
             </div>

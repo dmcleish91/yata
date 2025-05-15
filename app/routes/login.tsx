@@ -1,4 +1,4 @@
-import { LoaderCircle } from 'lucide-react';
+import { Eye, EyeClosed, LoaderCircle } from 'lucide-react';
 import { useState, useEffect, type FormEvent } from 'react';
 import { useNavigate } from 'react-router';
 import { useAuth } from '~/libs/auth/AuthContext';
@@ -9,6 +9,7 @@ export default function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const [passwordType, setPasswordType] = useState<'password' | 'text'>('password');
   const [checking, setIsChecking] = useState<boolean>(true);
 
   async function handleLogin(e: FormEvent) {
@@ -22,13 +23,21 @@ export default function Login() {
     }
   }
 
-  const handleEmailInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+  function handleEmailInput(e: React.ChangeEvent<HTMLInputElement>) {
     setEmail(e.target.value);
-  };
+  }
 
-  const handlePasswordInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+  function handlePasswordInput(e: React.ChangeEvent<HTMLInputElement>) {
     setPassword(e.target.value);
-  };
+  }
+
+  function handleShowPassword() {
+    setPasswordType('text');
+  }
+
+  function handleHidePassword() {
+    setPasswordType('password');
+  }
 
   useEffect(() => {
     async function checkAuth() {
@@ -81,18 +90,28 @@ export default function Login() {
             />
           </div>
           <div className='form-control'>
-            <label className='label'>
+            <div className='label'>
               <span className='label-text'>Password</span>
-            </label>
-            <input
-              type='password'
-              placeholder='Enter your password'
-              className='input input-bordered'
-              autoComplete='current-password'
-              value={password}
-              onChange={handlePasswordInput}
-              required
-            />
+            </div>
+
+            <div className='inline-flex items-center relative w-full'>
+              <button
+                className='btn btn-ghost btn-sm btn-circle absolute right-0 mr-2'
+                type='button'
+                onMouseDown={handleShowPassword}
+                onMouseUp={handleHidePassword}
+                onMouseLeave={handleHidePassword}
+                tabIndex={-1}>
+                {passwordType === 'password' ? <EyeClosed /> : <Eye />}
+              </button>
+
+              <input
+                id='password'
+                type={passwordType}
+                placeholder='********'
+                className='input input-bordered pr-11 w-full'
+              />
+            </div>
           </div>
           <button type='submit' className={`btn btn-primary w-full`} disabled={isLoading}>
             {isLoading ? 'Logging in...' : 'Login'}

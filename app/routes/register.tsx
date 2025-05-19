@@ -1,24 +1,27 @@
-import { useState, type ChangeEvent, type FormEvent } from 'react';
-import { toast } from 'sonner';
+import { useState, type FormEvent } from 'react';
+import { useNavigate } from 'react-router';
 import { APIEndpoints } from '~/constants/api';
 import ax from '~/libs/client';
 import { handleError } from '~/libs/handleError';
 
 export default function Register() {
-  const [loading, setLoading] = useState(false);
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [registrationSuccessful, setRegistrationSuccessful] = useState(false); // <-- new state
+  const [form, setForm] = useState({ username: '', email: '', password: '' });
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const navigate = useNavigate();
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
   async function handleRegister(e: FormEvent) {
     e.preventDefault();
-    setLoading(true);
+    setStatus('loading');
 
-    const payload = new URLSearchParams();
-    payload.append('username', username);
-    payload.append('email', email);
-    payload.append('password', password);
+    const payload = new URLSearchParams(form);
+    const loginPayload = new URLSearchParams({
+      email: form.email,
+      password: form.password,
+    });
 
     try {
       await ax.post(APIEndpoints.REGISTER, payload.toString(), {
@@ -26,17 +29,29 @@ export default function Register() {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
       });
-      setRegistrationSuccessful(true);
+      await ax.post(APIEndpoints.LOGIN, loginPayload.toString(), {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      });
+      setStatus('success');
     } catch (error) {
       handleError(error);
-    } finally {
-      setLoading(false);
+      setStatus('error');
     }
   }
 
-  if (registrationSuccessful) {
+  if (status === 'success') {
     return (
-      <main className='flex items-center justify-center min-h-screen bg-base-200'></main>
+      <main className='flex items-center justify-center min-h-screen bg-base-200'>
+        <div className='card w-96 bg-base-100 shadow-xl p-8 text-center'>
+          <h2 className='text-2xl font-semibold mb-4'>Registration Successful!</h2>
+          <p className='mb-6'>Your account has been created and you are now logged in.</p>
+          <button className='btn btn-primary w-full' onClick={() => navigate('/')}>
+            Go to App
+          </button>
+        </div>
+      </main>
     );
   }
 
@@ -50,12 +65,13 @@ export default function Register() {
               <span className='label-text'>Username</span>
             </label>
             <input
+              name='username'
               type='text'
               placeholder='Enter your username'
               className='input input-bordered'
               required
-              value={username}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)}
+              value={form.username}
+              onChange={handleChange}
             />
           </div>
           <div className='form-control'>
@@ -63,13 +79,14 @@ export default function Register() {
               <span className='label-text'>Email</span>
             </label>
             <input
+              name='email'
               type='email'
               placeholder='Enter your email'
               className='input input-bordered'
               required
               autoComplete='off'
-              value={email}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+              value={form.email}
+              onChange={handleChange}
             />
           </div>
           <div className='form-control'>
@@ -77,20 +94,24 @@ export default function Register() {
               <span className='label-text'>Password</span>
             </label>
             <input
+              name='password'
               type='password'
               placeholder='Enter your password'
               className='input input-bordered'
               required
               autoComplete='off'
-              value={password}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+              value={form.password}
+              onChange={handleChange}
             />
           </div>
           <button
             type='submit'
-            className={`btn btn-primary w-full ${loading ? 'loading' : ''}`}
-            disabled={loading}>
-            {loading ? 'Registering...' : 'Register'}
+            className={`btn btn-primary w-full`}
+            disabled={status === 'loading'}>
+            {status === 'loading' ? (
+              <span className='loading loading-spinner'></span>
+            ) : null}
+            {status === 'loading' ? 'Registering...' : 'Register'}
           </button>
         </form>
         <div className='text-center mt-4'>

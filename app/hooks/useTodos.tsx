@@ -13,10 +13,12 @@ import type { NewTodo, Todo } from '~/types/todo';
 
 export function useTodos() {
   const {
-    data: todos = [],
+    data: todosRaw,
     error,
     isLoading,
   } = useSWR(APIEndpoints.TODOS, fetchData<Todo[]>);
+
+  const todos: Todo[] = Array.isArray(todosRaw) ? todosRaw : [];
 
   const [editTodoID, setEditTodoID] = React.useState<number | null>(null);
   const [todo, setTodo] = React.useState<NewTodo>({
@@ -46,6 +48,13 @@ export function useTodos() {
       due_date: new Date(todo.due_date).toISOString(),
     };
 
+    setTodo({
+      todo_id: -1,
+      title: '',
+      description: '',
+      due_date: new Date().toISOString().split('T')[0],
+    });
+
     if (editTodoID) {
       const previousTodos = todos;
       const optimisticUpdatedTodos = todos.map((todo) =>
@@ -69,15 +78,10 @@ export function useTodos() {
           false
         );
         setEditTodoID(null);
-        setTodo({
-          todo_id: -1,
-          title: '',
-          description: '',
-          due_date: new Date().toISOString().split('T')[0],
-        });
         toast.success('Todo successfully edited');
       } catch (error) {
         mutate(APIEndpoints.TODOS, previousTodos, false);
+        setTodo(payload);
         handleError(error);
       }
     } else {
@@ -102,15 +106,10 @@ export function useTodos() {
           ],
           false
         );
-        setTodo({
-          todo_id: -1,
-          title: '',
-          description: '',
-          due_date: new Date().toISOString().split('T')[0],
-        });
         toast.success('Todo successfully added');
       } catch (error) {
         mutate(APIEndpoints.TODOS, previousTodos, false);
+        setTodo(payload);
         handleError(error);
       }
     }

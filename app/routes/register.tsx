@@ -1,13 +1,15 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router';
 import { APIEndpoints } from '~/constants/api';
 import ax from '~/libs/client';
 import { handleError } from '~/libs/handleError';
+import { useConfettiBurst } from '~/hooks/useConfettiBurst';
 
 export default function Register() {
   const [form, setForm] = useState({ username: '', email: '', password: '' });
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const navigate = useNavigate();
+  const { start: startConfetti } = useConfettiBurst();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -40,6 +42,12 @@ export default function Register() {
       setStatus('error');
     }
   }
+
+  useEffect(() => {
+    if (status === 'success') {
+      startConfetti({ duration: 5000, interval: 750 });
+    }
+  }, [status]);
 
   if (status === 'success') {
     return (

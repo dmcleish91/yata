@@ -47,6 +47,7 @@ Here's a checklist 🎯 of the exciting features we're working on to enhance you
 
 - [ ] Show statistics on completed tasks (e.g., weekly/monthly reports).
 - [ ] Track how long it takes to complete tasks.
+- [ ] Sending emails with Resend
 
 ### 6. Offline Support
 

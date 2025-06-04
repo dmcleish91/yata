@@ -1,90 +1,132 @@
 import { useState, createContext, useContext, type ReactNode, useEffect } from 'react';
-import type { AxiosError } from 'axios';
-import ax, { setAccessToken } from '../client';
 import type { AuthError, User } from '~/types/auth';
-import { handleError } from '../handleError';
-import { APIEndpoints } from '~/constants/api';
+import {
+  createClient,
+  type Session,
+  type AuthError as SupabaseAuthError,
+} from '@supabase/supabase-js';
+import ax from '../client';
+
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 type AuthContextType = {
   user: User | null;
   error: AuthError | null;
   isLoading: boolean;
-  login: (data: { email: string; password: string }) => Promise<void>;
   setUser: (user: User | null) => void;
-  logout: () => Promise<string | null>;
-  refreshToken: () => Promise<string | null>;
+  signInWithMagicLink: (email: string) => Promise<void>;
+  signOut: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [error, setError] = useState<AuthError | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  async function login(data: { email: string; password: string }): Promise<void> {
+  useEffect(() => {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      if (session?.user) {
+        const userData: User = {
+          id: session.user.id,
+          email: session.user.email || '',
+          isLoggedIn: true,
+        };
+        setUser(userData);
+        ax.defaults.headers.common['Authorization'] = `Bearer ${session.access_token}`;
+      }
+      setIsLoading(false);
+    });
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth event:', event, session);
+
+      setSession(session);
+
+      if (session?.user) {
+        const userData: User = {
+          id: session.user.id,
+          email: session.user.email || '',
+          isLoggedIn: true,
+        };
+        setUser(userData);
+        // Set authorization header for your backend
+        ax.defaults.headers.common['Authorization'] = `Bearer ${session.access_token}`;
+      } else {
+        setUser(null);
+        // Remove authorization header
+        delete ax.defaults.headers.common['Authorization'];
+      }
+
+      setIsLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  async function signInWithMagicLink(email: string): Promise<void> {
     try {
       setIsLoading(true);
       setError(null);
 
-      const payload = new URLSearchParams();
-      payload.append('email', data.email);
-      payload.append('password', data.password);
-
-      const response = await ax.post(APIEndpoints.LOGIN, payload.toString(), {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          // Redirect to your app after clicking magic link
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       });
 
-      if (response.status === 200) {
-        const { access_token } = response.data.data;
-        ax.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
-        setAccessToken(access_token);
-        setUser({ isLoggedIn: true });
-      }
+      if (error) throw error;
+
+      // Success - magic link sent
+      console.log('Magic link sent to', email);
     } catch (err) {
-      const error = err as AxiosError;
+      const supabaseError = err as SupabaseAuthError;
       setError({
-        message: error.message,
-        code: error.response?.status || 500,
+        message: supabaseError.message,
+        code: 400,
       });
-      throw error;
+      throw err;
     } finally {
       setIsLoading(false);
     }
   }
 
-  async function logout(): Promise<string | null> {
-    const response = await ax.post(APIEndpoints.LOGOUT);
-    delete ax.defaults.headers.common['Authorization'];
-    setAccessToken(null);
-    setUser(null);
-    return response.data;
-  }
-
-  async function refreshToken(): Promise<string | null> {
+  async function signOut(): Promise<void> {
     try {
-      const response = await ax.post(APIEndpoints.REFRESH_TOKEN);
+      setIsLoading(true);
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
 
-      if (response.status === 200) {
-        const { access_token } = response.data.data;
-        ax.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
-        setUser({ isLoggedIn: true });
-        setAccessToken(access_token);
-        return access_token;
-      }
-      return null;
-    } catch (error) {
-      handleError(error);
-      await logout();
-      return null;
+      setUser(null);
+      setSession(null);
+      delete ax.defaults.headers.common['Authorization'];
+    } catch (err) {
+      const supabaseError = err as SupabaseAuthError;
+      setError({
+        message: supabaseError.message,
+        code: 400,
+      });
+      throw err;
+    } finally {
+      setIsLoading(false);
     }
   }
 
   return (
     <AuthContext.Provider
-      value={{ user, setUser, error, isLoading, login, logout, refreshToken }}>
+      value={{ user, setUser, error, isLoading, signInWithMagicLink, signOut }}>
       {children}
     </AuthContext.Provider>
   );

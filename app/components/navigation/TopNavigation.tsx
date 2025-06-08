@@ -3,12 +3,12 @@ import { useAuth } from '~/libs/auth/AuthContext';
 import { handleError } from '~/libs/handleError';
 
 export default function TopNavigation({ children }: { children: React.ReactNode }) {
-  const { user, logout } = useAuth();
+  const { user, signOut } = useAuth();
   const navigate = useNavigate();
 
-  async function handleLogout() {
+  async function handleSignOut() {
     try {
-      const response = await logout();
+      const response = await signOut();
       console.log(response);
       navigate('/login');
     } catch (error) {
@@ -25,7 +25,7 @@ export default function TopNavigation({ children }: { children: React.ReactNode 
           </Link>
           <div className='space-x-4'>
             {user?.isLoggedIn ? (
-              <button onClick={handleLogout} className='btn btn-ghost'>
+              <button onClick={handleSignOut} className='btn btn-ghost'>
                 Logout
               </button>
             ) : (

@@ -11,6 +11,7 @@
   "dependencies": {
     "@react-router/node": "^7.5.0",
     "@react-router/serve": "^7.5.0",
+    "@supabase/supabase-js": "^2.49.9",
     "axios": "^1.8.4",
     "canvas-confetti": "^1.9.3",
     "isbot": "^5.1.26",
@@ -40,5 +41,5 @@
       "esbuild"
     ]
   },
-  "packageManager": "pnpm@10.8.1+sha256.d8b2ebbc65cf02c349eca6b45c9640b910f16b6adebdb7b926e9db440e47cac7"
+  "packageManager": "pnpm@10.11.1+sha256.211e9990148495c9fc30b7e58396f7eeda83d9243eb75407ea4f8650fb161f7c"
 }

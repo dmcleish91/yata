@@ -33,9 +33,6 @@ export default function TopNavigation({ children }: { children: React.ReactNode 
                 <Link to='/about' className='btn btn-ghost'>
                   About
                 </Link>
-                <Link to='/register' className='btn btn-ghost'>
-                  Register
-                </Link>
                 <Link to='/login' className='btn btn-ghost'>
                   Login
                 </Link>

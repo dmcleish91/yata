@@ -2,13 +2,21 @@ import React from 'react';
 import { toast } from 'sonner';
 import useSWR, { mutate } from 'swr';
 import { APIEndpoints } from '~/constants/api';
-import { createResource, deleteResource, editResource, fetchData } from '~/libs/httpMethods';
+import {
+  createResource,
+  deleteResource,
+  editResource,
+  fetchData,
+} from '~/libs/httpMethods';
 import { handleError } from '~/libs/handleError';
 import type { NewTodo, Todo } from '~/types/todo';
 
 export function useTodos() {
-  const { data: todosRaw, error, isLoading } = useSWR(APIEndpoints.TODOS, fetchData<Todo[]>);
-
+  const {
+    data: todosRaw,
+    error,
+    isLoading,
+  } = useSWR(APIEndpoints.TODOS, fetchData<Todo[]>);
   const todos: Todo[] = Array.isArray(todosRaw) ? todosRaw : [];
 
   const [editTodoID, setEditTodoID] = React.useState<number | null>(null);
@@ -18,24 +26,27 @@ export function useTodos() {
     description: '',
     due_date: new Date().toISOString().split('T')[0],
   });
-  const [tagsInput, setTagsInput] = React.useState<string>('');
+  const [tags, setTags] = React.useState<string[]>([]);
 
   function handleToggleTodo(id: number) {
     mutate(
       APIEndpoints.TODOS,
       (currentTodos: Todo[] = []) =>
-        currentTodos.map((todo) => (todo.todo_id === id ? { ...todo, is_completed: !todo.is_completed } : todo)),
+        currentTodos.map((todo) =>
+          todo.todo_id === id ? { ...todo, is_completed: !todo.is_completed } : todo
+        ),
       false
     );
   }
 
   async function handleAddTodo(e: React.FormEvent) {
     e.preventDefault();
-    const payload: NewTodo = {
+    const payload: NewTodo & { tags: string[] } = {
       todo_id: editTodoID || -1,
       title: todo.title,
       description: todo.description,
       due_date: new Date(todo.due_date).toISOString(),
+      tags: tags.filter((tag) => tag.length <= 10),
     };
 
     setTodo({
@@ -44,20 +55,28 @@ export function useTodos() {
       description: '',
       due_date: new Date().toISOString().split('T')[0],
     });
-    setTagsInput('');
+    setTags([]);
 
     if (editTodoID) {
       const previousTodos = todos;
-      const optimisticUpdatedTodos = todos.map((todo) => (todo.todo_id === editTodoID ? { ...todo, ...payload } : todo));
+      const optimisticUpdatedTodos = todos.map((todo) =>
+        todo.todo_id === editTodoID ? { ...todo, ...payload } : todo
+      );
 
       mutate(APIEndpoints.TODOS, optimisticUpdatedTodos, false);
 
       try {
-        const response = await editResource<NewTodo, Todo>(APIEndpoints.EDIT_TODOS, payload);
+        const response = await editResource<typeof payload, Todo>(
+          APIEndpoints.EDIT_TODOS,
+          payload
+        );
         const updatedTodo = response.data;
         mutate(
           APIEndpoints.TODOS,
-          (currentTodos: Todo[] = []) => currentTodos.map((todo) => (todo.todo_id === updatedTodo.todo_id ? updatedTodo : todo)),
+          (currentTodos: Todo[] = []) =>
+            currentTodos.map((todo) =>
+              todo.todo_id === updatedTodo.todo_id ? updatedTodo : todo
+            ),
           false
         );
         setEditTodoID(null);
@@ -65,7 +84,7 @@ export function useTodos() {
       } catch (error) {
         mutate(APIEndpoints.TODOS, previousTodos, false);
         setTodo(payload);
-        setTagsInput(tagsInput);
+        setTags(payload.tags);
         handleError(error);
       }
     } else {
@@ -74,27 +93,29 @@ export function useTodos() {
         ...payload,
         todo_id: Date.now(),
         is_completed: false,
-        tags: tagsInput
-          .split(',')
-          .map((tag) => tag.trim())
-          .filter((tag) => tag.length > 0),
       };
 
       mutate(APIEndpoints.TODOS, [optimisticNewTodo, ...todos], false);
 
       try {
-        const response = await createResource<NewTodo, Todo>(APIEndpoints.TODOS, payload);
+        const response = await createResource<typeof payload, Todo>(
+          APIEndpoints.TODOS,
+          payload
+        );
         const createdTodo = response.data;
         mutate(
           APIEndpoints.TODOS,
-          (currentTodos: Todo[] = []) => [createdTodo, ...currentTodos.filter((todo) => todo.todo_id !== optimisticNewTodo.todo_id)],
+          (currentTodos: Todo[] = []) => [
+            createdTodo,
+            ...currentTodos.filter((todo) => todo.todo_id !== optimisticNewTodo.todo_id),
+          ],
           false
         );
         toast.success('Todo successfully added');
       } catch (error) {
         mutate(APIEndpoints.TODOS, previousTodos, false);
         setTodo(payload);
-        setTagsInput(tagsInput);
+        setTags(payload.tags);
         handleError(error);
       }
     }
@@ -102,7 +123,11 @@ export function useTodos() {
 
   async function handleDeleteTodo(id: number) {
     const previousTodos = todos;
-    mutate(APIEndpoints.TODOS, (currentTodos: Todo[] = []) => currentTodos.filter((todo) => todo.todo_id !== id), false);
+    mutate(
+      APIEndpoints.TODOS,
+      (currentTodos: Todo[] = []) => currentTodos.filter((todo) => todo.todo_id !== id),
+      false
+    );
 
     try {
       const wasSuccessful = await deleteResource(APIEndpoints.DELETE_TODOS(id));
@@ -119,7 +144,7 @@ export function useTodos() {
   function clearEditAndResetTodo() {
     setEditTodoID(null);
     setTodo({ todo_id: -1, title: '', description: '', due_date: '' });
-    setTagsInput('');
+    setTags([]);
   }
 
   function handleEditTodo(id: number) {
@@ -135,7 +160,7 @@ export function useTodos() {
         description: todoToEdit?.description,
         due_date: todoToEdit?.due_date.split('T')[0],
       });
-      setTagsInput((todoToEdit.tags ?? []).join(', '));
+      setTags(todoToEdit.tags || []);
     } else {
       toast.error('Unable to edit todo');
     }
@@ -148,8 +173,8 @@ export function useTodos() {
     todo,
     editTodoID,
     setTodo,
-    tagsInput,
-    setTagsInput,
+    tags,
+    setTags,
     handleToggleTodo,
     handleAddTodo,
     handleDeleteTodo,

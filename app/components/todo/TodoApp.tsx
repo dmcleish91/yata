@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { Plus, Edit3, X, CalendarDays } from 'lucide-react';
+import { toast } from 'sonner';
 import TodoList from './TodoList';
 import { useTodos } from '~/hooks/useTodos';
 import type { Todo } from '~/types/todo';
@@ -12,8 +13,8 @@ export default function TodoApp() {
     todo,
     editTodoID,
     setTodo,
-    tagsInput,
-    setTagsInput,
+    tags,
+    setTags,
     handleToggleTodo,
     handleAddTodo,
     handleDeleteTodo,
@@ -52,7 +53,7 @@ export default function TodoApp() {
         {/* Form Card */}
         <div className='w-full xl:w-1/3'>
           <div className='card bg-base-100 shadow-xl p-6'>
-            <form className='space-y-6' onSubmit={handleFormSubmit}>
+            <form className='space-y-6' onSubmit={handleAddTodo}>
               <div className='flex items-center gap-2 text-2xl font-semibold mb-2 text-base-content'>
                 {isEditing ? (
                   <>
@@ -105,27 +106,65 @@ export default function TodoApp() {
                   />
                   <CalendarDays className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-base-content/40' />
                 </div>
-              </div>
+              </div>{' '}
               <div className='form-control'>
                 <label className='label' htmlFor='tags'>
                   <span className='label-text'>Tags</span>
                 </label>
-                <input
-                  id='tags'
-                  type='text'
-                  className='input input-bordered w-full'
-                  placeholder='Enter tags separated by commas'
-                  value={tagsInput}
-                  onChange={(e) => setTagsInput(e.target.value)}
-                />
-                <span className='label-text-alt text-xs'>Separate multiple tags with commas</span>
+                <div className='flex flex-wrap gap-2 mb-2'>
+                  {tags.map((tag, index) => (
+                    <div key={index} className='badge badge-success gap-1 p-3'>
+                      <span>{tag}</span>
+                      <button
+                        type='button'
+                        className='btn btn-ghost btn-xs px-1'
+                        onClick={() => {
+                          setTags(tags.filter((_, i) => i !== index));
+                        }}>
+                        <X className='h-3 w-3' />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <div className='input-group'>
+                  <input
+                    id='new-tag'
+                    type='text'
+                    className='input input-bordered w-full'
+                    placeholder='Type a tag and press Enter'
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const newTag = e.currentTarget.value.trim();
+                        if (!newTag) return;
+                        if (newTag.length > 10) {
+                          toast.error('Tag must be 10 characters or less');
+                          return;
+                        }
+                        if (tags.includes(newTag)) {
+                          toast.error('Tag already exists');
+                          return;
+                        }
+                        setTags([...tags, newTag]);
+                        e.currentTarget.value = '';
+                      }
+                    }}
+                  />
+                </div>
               </div>
               <div className='flex gap-3 pt-2'>
-                <button type='submit' className={`btn ${isEditing ? 'btn-primary' : 'btn-success'} flex-1 text-white`}>
+                <button
+                  type='submit'
+                  className={`btn ${
+                    isEditing ? 'btn-primary' : 'btn-success'
+                  } flex-1 text-white`}>
                   {isEditing ? 'Update Task' : 'Add Task'}
                 </button>
                 {isEditing && (
-                  <button type='button' className='btn btn-outline btn-error flex items-center gap-1' onClick={clearEditAndResetTodo}>
+                  <button
+                    type='button'
+                    className='btn btn-outline btn-error flex items-center gap-1'
+                    onClick={clearEditAndResetTodo}>
                     <X className='h-4 w-4' /> Cancel
                   </button>
                 )}

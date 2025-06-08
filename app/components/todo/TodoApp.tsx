@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { Plus, Edit3, X, CalendarDays } from 'lucide-react';
+import TodoList from './TodoList';
 import { useTodos } from '~/hooks/useTodos';
-import TodoItem from './TodoItem';
+import type { Todo } from '~/types/todo';
 
 const itemsPerPage = 4;
 
@@ -10,6 +12,8 @@ export default function TodoApp() {
     todo,
     editTodoID,
     setTodo,
+    tagsInput,
+    setTagsInput,
     handleToggleTodo,
     handleAddTodo,
     handleDeleteTodo,
@@ -17,9 +21,11 @@ export default function TodoApp() {
     clearEditAndResetTodo,
   } = useTodos();
 
+  const isEditing = editTodoID !== null;
+
   const [currentPage, setCurrentPage] = React.useState<number>(1);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (todos.length <= itemsPerPage) {
       setCurrentPage(1);
     }
@@ -30,97 +36,116 @@ export default function TodoApp() {
   const currentTodos = todos.slice(indexOfFirstTodo, indexOfLastTodo);
   const totalPages = Math.ceil(todos.length / itemsPerPage);
 
+  function handleFormSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!todo.title.trim()) return;
+    handleAddTodo(e);
+  }
+
+  function handleEdit(todoToEdit: Todo) {
+    handleEditTodo(todoToEdit.todo_id);
+  }
+
   return (
-    <main className='flex items-center justify-center h-full bg-base-200'>
-      <div className='card w-5/6 lg:w-3/5 xl:w-3/5 2xl:w-2/5 bg-base-100 xl:h-[450px] shadow-xl p-8 flex flex-col-reverse xl:flex-row'>
-        <div className='xl:w-1/2 xl:pr-4 mt-4 xl:mt-0 flex flex-col'>
-          <h2 className='text-center text-2xl font-semibold mb-2'>
-            {editTodoID ? 'Edit Todo' : 'Add Todo'}
-          </h2>
-          <form
-            className='flex flex-col justify-between h-full gap-4'
-            onSubmit={handleAddTodo}>
-            <div className='form-control flex justify-between'>
-              <label className='label'>
-                <span className='label-text 2xl:hidden'>Title</span>
-              </label>
-              <input
-                type='text'
-                placeholder='Enter title'
-                className='input input-bordered w-48 md:w-60 lg:w-64 xl:w-48 2xl:w-full'
-                value={todo.title}
-                onChange={(e) => setTodo({ ...todo, title: e.target.value })}
-                required
-              />
-            </div>
-            <div className='form-control flex justify-between'>
-              <label className='label'>
-                <span className='label-text 2xl:hidden'>Description</span>
-              </label>
-              <textarea
-                className='textarea textarea-bordered w-48 md:w-60 lg:w-64 xl:w-48 2xl:w-full'
-                placeholder='Enter description'
-                value={todo.description}
-                onChange={(e) => setTodo({ ...todo, description: e.target.value })}
-                required></textarea>
-            </div>
-            <div className='form-control flex gap-2 justify-between'>
-              <label className='label'>
-                <span className='label-text'>Due Date</span>
-              </label>
-              <input
-                type='date'
-                className='input input-bordered w-48 md:w-60 lg:w-64 xl:w-48 2xl:w-72'
-                value={todo.due_date}
-                onChange={(e) => setTodo({ ...todo, due_date: e.target.value })}
-                required
-              />
-            </div>
-            <div className='flex flex-row gap-2'>
-              <button
-                type='submit'
-                className={`btn btn-success ${editTodoID ? 'w-3/4' : 'w-full'}`}>
-                {editTodoID ? 'Edit Todo' : 'Add Todo'}
-              </button>
-              {editTodoID && (
-                <button
-                  type='button'
-                  className={'btn btn-error w-1/4'}
-                  onClick={clearEditAndResetTodo}>
-                  Cancel Edit
-                </button>
-              )}
-            </div>
-          </form>
-        </div>
-        <div className='flex flex-col xl:w-1/2 xl:border-l'>
-          <h2 className='text-center text-2xl font-semibold mb-2 w-full'>Todos</h2>
-          <ul className='list space-y-2 flex-grow'>
-            {currentTodos.map((todo) => (
-              <TodoItem
-                key={todo.todo_id}
-                todo={todo}
-                onToggle={handleToggleTodo}
-                editTodo={handleEditTodo}
-                deleteTodo={handleDeleteTodo}
-              />
-            ))}
-          </ul>
-          <div className='mt-2 flex justify-center'>
-            {totalPages > 1 && (
-              <div className='join'>
-                {Array.from({ length: totalPages }, (_, index) => (
-                  <button
-                    key={index + 1}
-                    className={`join-item btn ${
-                      currentPage === index + 1 ? 'btn-active' : ''
-                    }`}
-                    onClick={() => setCurrentPage(index + 1)}>
-                    {index + 1}
-                  </button>
-                ))}
+    <main className='flex items-center justify-center min-h-screen bg-base-200 p-4'>
+      <div className='flex flex-col gap-8 w-full max-w-6xl xl:flex-row xl:items-start xl:gap-8'>
+        {/* Form Card */}
+        <div className='w-full xl:w-1/3'>
+          <div className='card bg-base-100 shadow-xl p-6'>
+            <form className='space-y-6' onSubmit={handleFormSubmit}>
+              <div className='flex items-center gap-2 text-2xl font-semibold mb-2 text-base-content'>
+                {isEditing ? (
+                  <>
+                    <Edit3 className='h-5 w-5 text-primary' /> Edit Todo
+                  </>
+                ) : (
+                  <>
+                    <Plus className='h-5 w-5 text-success' /> Add New Todo
+                  </>
+                )}
               </div>
-            )}
+              <div className='form-control'>
+                <label className='label' htmlFor='title'>
+                  <span className='label-text'>Task Title</span>
+                </label>
+                <input
+                  id='title'
+                  type='text'
+                  placeholder='Enter task title'
+                  className='input input-bordered w-full'
+                  value={todo.title}
+                  onChange={(e) => setTodo({ ...todo, title: e.target.value })}
+                  required
+                />
+              </div>
+              <div className='form-control'>
+                <label className='label' htmlFor='description'>
+                  <span className='label-text'>Description</span>
+                </label>
+                <textarea
+                  id='description'
+                  className='textarea textarea-bordered w-full min-h-[100px]'
+                  placeholder='Enter description'
+                  value={todo.description}
+                  onChange={(e) => setTodo({ ...todo, description: e.target.value })}
+                  required></textarea>
+              </div>
+              <div className='form-control'>
+                <label className='label' htmlFor='due_date'>
+                  <span className='label-text'>Due Date</span>
+                </label>
+                <div className='relative'>
+                  <input
+                    id='due_date'
+                    type='date'
+                    className='input input-bordered w-full pl-10'
+                    value={todo.due_date}
+                    onChange={(e) => setTodo({ ...todo, due_date: e.target.value })}
+                    required
+                  />
+                  <CalendarDays className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-base-content/40' />
+                </div>
+              </div>
+              <div className='form-control'>
+                <label className='label' htmlFor='tags'>
+                  <span className='label-text'>Tags</span>
+                </label>
+                <input
+                  id='tags'
+                  type='text'
+                  className='input input-bordered w-full'
+                  placeholder='Enter tags separated by commas'
+                  value={tagsInput}
+                  onChange={(e) => setTagsInput(e.target.value)}
+                />
+                <span className='label-text-alt text-xs'>Separate multiple tags with commas</span>
+              </div>
+              <div className='flex gap-3 pt-2'>
+                <button type='submit' className={`btn ${isEditing ? 'btn-primary' : 'btn-success'} flex-1 text-white`}>
+                  {isEditing ? 'Update Task' : 'Add Task'}
+                </button>
+                {isEditing && (
+                  <button type='button' className='btn btn-outline btn-error flex items-center gap-1' onClick={clearEditAndResetTodo}>
+                    <X className='h-4 w-4' /> Cancel
+                  </button>
+                )}
+              </div>
+            </form>
+          </div>
+        </div>
+        {/* Todo List Card */}
+        <div className='w-full xl:w-2/3'>
+          <div className='card bg-base-100 shadow-xl p-6'>
+            <TodoList
+              todos={currentTodos}
+              onToggle={handleToggleTodo}
+              onEdit={handleEdit}
+              onDelete={handleDeleteTodo}
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+              totalTodos={todos.length}
+            />
           </div>
         </div>
       </div>

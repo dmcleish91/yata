@@ -49,9 +49,9 @@ export default function TodoApp() {
 
   return (
     <main className='flex items-center justify-center min-h-screen bg-base-200 p-4'>
-      <div className='flex flex-col gap-8 w-full max-w-6xl xl:flex-row xl:items-start xl:gap-8'>
+      <div className='flex flex-col gap-8 w-full max-w-6xl'>
         {/* Form Card */}
-        <div className='w-full xl:w-1/3'>
+        <div className='w-full'>
           <div className='card bg-base-100 shadow-xl p-6'>
             <form className='space-y-6' onSubmit={handleAddTodo}>
               <div className='flex items-center gap-2 text-2xl font-semibold mb-2 text-base-content'>
@@ -173,7 +173,7 @@ export default function TodoApp() {
           </div>
         </div>
         {/* Todo List Card */}
-        <div className='w-full xl:w-2/3'>
+        <div className='w-full'>
           <div className='card bg-base-100 shadow-xl p-6'>
             <TodoList
               todos={currentTodos}

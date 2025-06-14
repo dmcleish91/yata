@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Plus, Edit3, X, CalendarDays, PlusIcon, Tag } from "lucide-react";
 import { toast } from "sonner";
 import type { NewTodo } from "~/types/todo";
@@ -27,9 +27,116 @@ export default function TodoForm({
   onSubmit,
   onCancel,
 }: TodoFormProps) {
+  const [showForm, setShowForm] = useState<boolean>(false);
+
+  // If editing, always show the form
+  if (isEditing) {
+    return (
+      <div className="border p-2 w-96">
+        <form onSubmit={onSubmit}>
+          <div className="flex flex-col">
+            <MinimalInput
+              placeholder="Add a Task"
+              icon={PlusIcon}
+              onChange={(value) => setTodo({ ...todo, title: value })}
+              value={todo.title}
+              required
+            />
+            <MinimalInput
+              placeholder="Enter description"
+              icon={PlusIcon}
+              onChange={(value) => setTodo({ ...todo, description: value })}
+              value={todo.description}
+              required
+            />
+            <MinimalInput
+              type="date"
+              icon={CalendarDays}
+              onChange={(value) => setTodo({ ...todo, due_date: value })}
+              value={todo.due_date}
+              required
+            />
+            <div className="flex flex-wrap gap-2">
+              {tags.map((tag, index) => (
+                <div key={index} className="badge badge-success gap-1 p-3">
+                  <span>{tag}</span>
+                  <button
+                    type="button"
+                    className="btn btn-ghost btn-xs px-1"
+                    onClick={() => {
+                      setTags(tags.filter((_, i) => i !== index));
+                    }}
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              ))}
+            </div>
+            <MinimalInput
+              id="new-tag"
+              icon={Tag}
+              placeholder="Type a tag and press Enter"
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  const newTag = e.currentTarget.value.trim();
+                  if (!newTag) return;
+                  if (newTag.length > 10) {
+                    toast.error("Tag must be 10 characters or less");
+                    return;
+                  }
+                  if (tags.includes(newTag)) {
+                    toast.error("Tag already exists");
+                    return;
+                  }
+                  setTags([...tags, newTag]);
+                  e.currentTarget.value = "";
+                }
+              }}
+            />
+          </div>
+          <div className="flex justify-end gap-3 pt-2">
+            <button type="submit" className="btn btn-primary text-white">
+              Update Task
+            </button>
+            {onCancel && (
+              <button
+                type="button"
+                className="btn btn-outline btn-error flex items-center gap-1"
+                onClick={onCancel}
+              >
+                <X className="h-4 w-4" /> Cancel
+              </button>
+            )}
+          </div>
+        </form>
+      </div>
+    );
+  }
+
+  // If not editing, show either the button or the form
+  if (!showForm) {
+    return (
+      <div className="border p-2 w-fit">
+        <button
+          type="button"
+          className="btn btn-success text-white"
+          onClick={() => setShowForm(true)}
+        >
+          <Plus className="h-4 w-4 mr-2" /> Add New Task
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <div className="border p-2">
-      <form onSubmit={onSubmit}>
+    <div className="border p-2 w-96">
+      <form
+        onSubmit={(e) => {
+          onSubmit(e);
+          setShowForm(false);
+        }}
+      >
         <div className="flex flex-col">
           <MinimalInput
             placeholder="Add a Task"
@@ -93,22 +200,15 @@ export default function TodoForm({
         </div>
         <div className="flex justify-end gap-3 pt-2">
           <button
-            type="submit"
-            className={`btn ${
-              isEditing ? "btn-primary" : "btn-success"
-            } text-white`}
+            type="button"
+            className="btn btn-outline btn-error flex items-center gap-1"
+            onClick={() => setShowForm(false)}
           >
-            {isEditing ? "Update Task" : "Add Task"}
+            <X className="h-4 w-4" /> Cancel
           </button>
-          {isEditing && onCancel && (
-            <button
-              type="button"
-              className="btn btn-outline btn-error flex items-center gap-1"
-              onClick={onCancel}
-            >
-              <X className="h-4 w-4" /> Cancel
-            </button>
-          )}
+          <button type="submit" className="btn btn-success text-white">
+            Add Task
+          </button>
         </div>
       </form>
     </div>

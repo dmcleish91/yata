@@ -47,10 +47,9 @@ export default function TodoApp() {
   }
 
   return (
-    <main className="w-3/5 flex min-h-screen bg-base-200 p-4">
+    <main className="w-full flex min-h-screen bg-base-100 p-4 rounded-3xl">
       <div className="flex flex-col gap-8 w-full max-w-6xl">
-        {/* Form Card */}
-        <div className="w-full">
+        <div>
           <TodoForm
             todo={todo}
             setTodo={setTodo}
@@ -61,8 +60,7 @@ export default function TodoApp() {
             onCancel={clearEditAndResetTodo}
           />
         </div>
-        {/* Todo List Card */}
-        <div className="w-full">
+        <div className="w-4/5">
           <div className="p-6 border-2 mx-auto">
             <TodoList
               todos={currentTodos}

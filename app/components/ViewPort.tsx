@@ -12,7 +12,7 @@ interface ViewPortProps {
  */
 export function ViewPort({ children }: ViewPortProps): React.ReactElement {
   return (
-    <div className="min-h-screen flex items-center bg-base-200 p-4 w-full border-4 rounded-xl border-base-300">
+    <div className="flex items-center bg-base-300 w-full h-full border-8 border-base-300 box-border overflow-hidden">
       {children}
     </div>
   );

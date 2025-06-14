@@ -32,7 +32,7 @@ export default function TodoApp() {
   return (
     <main className="w-full flex min-h-screen bg-base-100 p-4 rounded-3xl">
       <div className="flex flex-col gap-8 w-full max-w-6xl">
-        <div className="p-6 border-2 mx-auto w-full">
+        <div className="p-6 mx-auto w-full">
           <TodoList
             todos={todos}
             onToggle={handleToggleTodo}

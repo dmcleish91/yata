@@ -6,11 +6,9 @@ import {
   type AuthError as SupabaseAuthError,
 } from '@supabase/supabase-js';
 import ax from '../client';
+import { env } from '../../../src/config/env';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = createClient(env.VITE_SUPABASE_URL, env.VITE_SUPABASE_ANON_KEY);
 
 type AuthContextType = {
   user: User | null;

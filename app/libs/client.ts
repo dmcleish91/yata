@@ -1,11 +1,12 @@
 import axios from 'axios';
 import { handleError } from './handleError';
 import { APIEndpoints } from '~/constants/api';
+import { env } from '../../src/config/env';
 
 let authToken: string | null = null;
 
 const ax = axios.create({
-  baseURL: import.meta.env.VITE_BASEURL,
+  baseURL: env.VITE_BASEURL,
   withCredentials: true,
 });
 

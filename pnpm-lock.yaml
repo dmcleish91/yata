@@ -50,6 +50,9 @@ importers:
       use-sound:
         specifier: ^5.0.0
         version: 5.0.0(react@19.1.0)
+      zod:
+        specifier: ^3.25.64
+        version: 3.25.64
     devDependencies:
       '@react-router/dev':
         specifier: ^7.5.0
@@ -2431,6 +2434,9 @@ packages:
     resolution: {integrity: sha512-r3vXyErRCYJ7wg28yvBY5VSoAF8ZvlcW9/BwUzEtUsjvX/DKs24dIkuwjtuprwJJHsbyUbLApepYTR1BN4uHrg==}
     engines: {node: '>= 6'}
 
+  zod@3.25.64:
+    resolution: {integrity: sha512-hbP9FpSZf7pkS7hRVUrOjhwKJNyampPgtXKc3AN6DsWtoHsg2Sb4SQaS4Tcay380zSwd2VPo9G9180emBACp5g==}
+
 snapshots:
 
   '@ampproject/remapping@2.3.0':
@@ -4723,3 +4729,5 @@ snapshots:
   yallist@3.1.1: {}
 
   yaml@1.10.2: {}
+
+  zod@3.25.64: {}

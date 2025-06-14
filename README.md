@@ -2,6 +2,8 @@
 
 ## About This Project
 
+https://yata-delta.vercel.app/
+
 Yet Another Todo App (YATA) was built to demonstrate clean and modern React application architecture.
 
 ### Features of the Application

@@ -14,68 +14,42 @@ Yet Another Todo App (YATA) was built to demonstrate clean and modern React appl
 
 ---
 
-Here's a checklist 🎯 of the exciting features we're working on to enhance your productivity and collaboration experience:
+Here's a checklist 🎯 of the exciting features we're working on to enhance your productivity and experience:
 
 ---
 
 ## 🚀 Coming Soon Features
 
-### 1. User Authentication Enhancements
+### 1. Core Task Management
 
-- [ ] Implement a "Forgot Password" feature to allow users to reset their passwords.
-- [ ] Add support for logging in with Google, Facebook, or other social accounts.
+- [ ] Add, edit, and delete tasks.
+- [ ] Mark tasks as complete/incomplete.
+- [ ] Set due dates for tasks.
+- [ ] Assign priority levels (e.g., High, Medium, Low).
+- [ ] Categorize tasks with tags or labels.
+- [ ] Create recurring tasks (e.g., daily, weekly).
 
-### 2. Todo Management Features
+### 2. UI/UX Improvements
 
-- [ ] Allow users to categorize or tag their todos for better organization.
-- [ ] Add priority levels (e.g., High, Medium, Low) to todos.
-- [ ] Enable users to set recurring tasks (e.g., daily, weekly).
-- [ ] Send email or push notifications for tasks nearing their due dates.
-
-### 3. UI/UX Improvements
-
-- [ ] Add a toggle for light and dark themes.
-- [ ] Allow users to reorder their todos via drag-and-drop.
+- [ ] Toggle between light and dark themes.
+- [ ] Reorder tasks via drag-and-drop.
 - [ ] Show a progress bar or percentage of completed tasks.
+- [ ] UI sounds for interactive feedback.
 
-### 4. Collaboration Features
+### 3. Search & Filters
 
-- [ ] Allow users to share tasks with others and collaborate in real-time.
-- [ ] Add a comment section for each todo to discuss details.
+- [ ] Search for tasks by keyword.
+- [ ] Filter tasks by tag, priority, due date, or completion status.
 
-### 5. Analytics and Insights
+### 4. Offline & Mobile Support
 
-- [ ] Show statistics on completed tasks (e.g., weekly/monthly reports).
-- [ ] Track how long it takes to complete tasks.
-- [ ] Sending emails with Resend
-
-### 6. Offline Support
-
-- [ ] Allow users to manage todos offline and sync them when back online.
-
-### 7. Search and Filters
-
-- [ ] Add a search bar to quickly find specific todos.
-- [ ] Filter todos by tags, priority, due date, or completion status.
-
-### 8. Mobile-Friendly Features
-
-- [ ] Ensure the app works seamlessly on mobile devices.
-- [ ] Allow users to install the app on their devices as a Progressive Web App (PWA).
-
-### 9. Gamification
-
-- [ ] Reward users with badges for completing tasks.
-- [ ] Track and display streaks for completing tasks daily.
-
-### 10. Integration with Other Tools
-
-- [ ] Integrate with Google Calendar or Outlook to sync due dates.
-- [ ] Integrate with tools like Slack or Trello for task management.
+- [ ] Use the app offline and sync when back online.
+- [ ] Mobile-friendly responsive design.
+- [ ] Installable as a Progressive Web App (PWA).
 
 ---
 
 Stay tuned for updates and new feature rollouts!  
-We’re building a better way to manage your tasks — one update at a time.
+We're building a better way to manage your tasks — one update at a time.
 
 🛠️ Built with ❤️ by Dwight

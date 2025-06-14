@@ -1,15 +1,15 @@
-import React from 'react';
-import { toast } from 'sonner';
-import useSWR, { mutate } from 'swr';
-import { APIEndpoints } from '~/constants/api';
+import { useState } from "react";
+import { toast } from "sonner";
+import useSWR, { mutate } from "swr";
+import { APIEndpoints } from "~/constants/api";
 import {
   createResource,
   deleteResource,
   editResource,
   fetchData,
-} from '~/libs/httpMethods';
-import { handleError } from '~/libs/handleError';
-import type { NewTodo, Todo } from '~/types/todo';
+} from "~/libs/httpMethods";
+import { handleError } from "~/libs/handleError";
+import type { NewTodo, Todo } from "~/types/todo";
 
 export function useTodos() {
   const {
@@ -19,21 +19,23 @@ export function useTodos() {
   } = useSWR(APIEndpoints.TODOS, fetchData<Todo[]>);
   const todos: Todo[] = Array.isArray(todosRaw) ? todosRaw : [];
 
-  const [editTodoID, setEditTodoID] = React.useState<number | null>(null);
-  const [todo, setTodo] = React.useState<NewTodo>({
+  const [editTodoID, setEditTodoID] = useState<number | null>(null);
+  const [todo, setTodo] = useState<NewTodo>({
     todo_id: -1,
-    title: '',
-    description: '',
-    due_date: new Date().toISOString().split('T')[0],
+    title: "",
+    description: "",
+    due_date: new Date().toISOString().split("T")[0],
   });
-  const [tags, setTags] = React.useState<string[]>([]);
+  const [tags, setTags] = useState<string[]>([]);
 
   function handleToggleTodo(id: number) {
     mutate(
       APIEndpoints.TODOS,
       (currentTodos: Todo[] = []) =>
         currentTodos.map((todo) =>
-          todo.todo_id === id ? { ...todo, is_completed: !todo.is_completed } : todo
+          todo.todo_id === id
+            ? { ...todo, is_completed: !todo.is_completed }
+            : todo
         ),
       false
     );
@@ -51,9 +53,9 @@ export function useTodos() {
 
     setTodo({
       todo_id: -1,
-      title: '',
-      description: '',
-      due_date: new Date().toISOString().split('T')[0],
+      title: "",
+      description: "",
+      due_date: new Date().toISOString().split("T")[0],
     });
     setTags([]);
 
@@ -80,7 +82,7 @@ export function useTodos() {
           false
         );
         setEditTodoID(null);
-        toast.success('Todo successfully edited');
+        toast.success("Todo successfully edited");
       } catch (error) {
         mutate(APIEndpoints.TODOS, previousTodos, false);
         setTodo(payload);
@@ -95,7 +97,7 @@ export function useTodos() {
         is_completed: false,
       };
 
-      mutate(APIEndpoints.TODOS, [optimisticNewTodo, ...todos], false);
+      mutate(APIEndpoints.TODOS, [...todos, optimisticNewTodo], false);
 
       try {
         const response = await createResource<typeof payload, Todo>(
@@ -106,12 +108,14 @@ export function useTodos() {
         mutate(
           APIEndpoints.TODOS,
           (currentTodos: Todo[] = []) => [
+            ...currentTodos.filter(
+              (todo) => todo.todo_id !== optimisticNewTodo.todo_id
+            ),
             createdTodo,
-            ...currentTodos.filter((todo) => todo.todo_id !== optimisticNewTodo.todo_id),
           ],
           false
         );
-        toast.success('Todo successfully added');
+        toast.success("Todo successfully added");
       } catch (error) {
         mutate(APIEndpoints.TODOS, previousTodos, false);
         setTodo(payload);
@@ -125,25 +129,26 @@ export function useTodos() {
     const previousTodos = todos;
     mutate(
       APIEndpoints.TODOS,
-      (currentTodos: Todo[] = []) => currentTodos.filter((todo) => todo.todo_id !== id),
+      (currentTodos: Todo[] = []) =>
+        currentTodos.filter((todo) => todo.todo_id !== id),
       false
     );
 
     try {
       const wasSuccessful = await deleteResource(APIEndpoints.DELETE_TODOS(id));
       if (!wasSuccessful) {
-        throw new Error('Failed to delete todo');
+        throw new Error("Failed to delete todo");
       }
-      toast.success('Successfully deleted entry');
+      toast.success("Successfully deleted entry");
     } catch (error) {
       mutate(APIEndpoints.TODOS, previousTodos, false);
-      toast.error('Error deleting todo');
+      toast.error("Error deleting todo");
     }
   }
 
   function clearEditAndResetTodo() {
     setEditTodoID(null);
-    setTodo({ todo_id: -1, title: '', description: '', due_date: '' });
+    setTodo({ todo_id: -1, title: "", description: "", due_date: "" });
     setTags([]);
   }
 
@@ -158,11 +163,11 @@ export function useTodos() {
         todo_id: id,
         title: todoToEdit?.title,
         description: todoToEdit?.description,
-        due_date: todoToEdit?.due_date.split('T')[0],
+        due_date: todoToEdit?.due_date.split("T")[0],
       });
       setTags(todoToEdit.tags || []);
     } else {
-      toast.error('Unable to edit todo');
+      toast.error("Unable to edit todo");
     }
   }
 

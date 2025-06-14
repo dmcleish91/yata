@@ -1,10 +1,6 @@
-import React, { useEffect } from "react";
 import TodoList from "./TodoList";
-import TodoForm from "./TodoForm";
 import { useTodos } from "~/hooks/useTodos";
 import type { Todo } from "~/types/todo";
-
-const itemsPerPage = 4;
 
 export default function TodoApp() {
   const {
@@ -23,19 +19,6 @@ export default function TodoApp() {
 
   const isEditing = editTodoID !== null;
 
-  const [currentPage, setCurrentPage] = React.useState<number>(1);
-
-  useEffect(() => {
-    if (todos.length <= itemsPerPage) {
-      setCurrentPage(1);
-    }
-  }, [todos]);
-
-  const indexOfLastTodo = currentPage * itemsPerPage;
-  const indexOfFirstTodo = indexOfLastTodo - itemsPerPage;
-  const currentTodos = todos.slice(indexOfFirstTodo, indexOfLastTodo);
-  const totalPages = Math.ceil(todos.length / itemsPerPage);
-
   function handleFormSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!todo.title.trim()) return;
@@ -49,8 +32,13 @@ export default function TodoApp() {
   return (
     <main className="w-full flex min-h-screen bg-base-100 p-4 rounded-3xl">
       <div className="flex flex-col gap-8 w-full max-w-6xl">
-        <div>
-          <TodoForm
+        <div className="p-6 border-2 mx-auto w-full">
+          <TodoList
+            todos={todos}
+            onToggle={handleToggleTodo}
+            onEdit={handleEdit}
+            onDelete={handleDeleteTodo}
+            totalTodos={todos.length}
             todo={todo}
             setTodo={setTodo}
             tags={tags}
@@ -59,20 +47,6 @@ export default function TodoApp() {
             onSubmit={handleFormSubmit}
             onCancel={clearEditAndResetTodo}
           />
-        </div>
-        <div className="w-4/5">
-          <div className="p-6 border-2 mx-auto">
-            <TodoList
-              todos={currentTodos}
-              onToggle={handleToggleTodo}
-              onEdit={handleEdit}
-              onDelete={handleDeleteTodo}
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
-              totalTodos={todos.length}
-            />
-          </div>
         </div>
       </div>
     </main>

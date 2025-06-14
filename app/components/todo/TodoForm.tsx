@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Plus, Edit3, X, CalendarDays, PlusIcon, Tag } from "lucide-react";
+import { Plus, X, CalendarDays, PlusIcon, Tag } from "lucide-react";
 import { toast } from "sonner";
 import type { NewTodo } from "~/types/todo";
 import MinimalInput from "~/components/ui/MinimalInput";
@@ -32,7 +32,7 @@ export default function TodoForm({
   // If editing, always show the form
   if (isEditing) {
     return (
-      <div className="border p-2 w-96">
+      <div className="p-2 w-96">
         <form onSubmit={onSubmit}>
           <div className="flex flex-col">
             <MinimalInput
@@ -117,7 +117,7 @@ export default function TodoForm({
   // If not editing, show either the button or the form
   if (!showForm) {
     return (
-      <div className="border p-2 w-fit">
+      <div className="p-2 w-fit">
         <button
           type="button"
           className="btn btn-success text-white"
@@ -130,7 +130,7 @@ export default function TodoForm({
   }
 
   return (
-    <div className="border p-2 w-96">
+    <div className="p-2 w-96">
       <form
         onSubmit={(e) => {
           onSubmit(e);

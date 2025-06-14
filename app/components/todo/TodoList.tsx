@@ -1,6 +1,6 @@
 import TodoItem from "./TodoItem";
-import { ChevronLeft, ChevronRight, CheckCircle2 } from "lucide-react";
-import type { Todo } from "~/types/todo";
+import TodoForm from "./TodoForm";
+import type { Todo, NewTodo } from "~/types/todo";
 
 /**
  * Props for the TodoList component.
@@ -10,39 +10,53 @@ export type TodoListProps = {
   onToggle: (id: number) => void;
   onEdit: (todo: Todo) => void;
   onDelete: (id: number) => void;
-  currentPage: number;
-  totalPages: number;
-  onPageChange: (page: number) => void;
   totalTodos: number;
+  todo: NewTodo;
+  setTodo: (todo: NewTodo) => void;
+  tags: string[];
+  setTags: (tags: string[]) => void;
+  isEditing: boolean;
+  onSubmit: (e: React.FormEvent) => void;
+  onCancel?: () => void;
 };
 
 /**
- * TodoList component displays a list of todos with pagination and empty state, using DaisyUI 5.
+ * TodoList component displays a list of todos with empty state, using DaisyUI 5.
  */
 export default function TodoList({
   todos,
   onToggle,
   onEdit,
   onDelete,
-  currentPage,
-  totalPages,
-  onPageChange,
   totalTodos,
+  todo,
+  setTodo,
+  tags,
+  setTags,
+  isEditing,
+  onSubmit,
+  onCancel,
 }: TodoListProps) {
   // Empty state
   if (totalTodos === 0) {
     return (
-      <div className="w-3/5 flex flex-col items-center justify-center text-center">
-        <div className="w-24 h-24 bg-base-200 rounded-full flex items-center justify-center mb-6">
-          <CheckCircle2 className="h-12 w-12 text-base-content/30" />
+      <div className="w-full flex flex-col text-center">
+        <TodoForm
+          todo={todo}
+          setTodo={setTodo}
+          tags={tags}
+          setTags={setTags}
+          isEditing={isEditing}
+          onSubmit={onSubmit}
+          onCancel={onCancel}
+        />
+        <div className="mt-4">
+          <p className="max-w-sm">No todos yet</p>
+          <p className="text-base-content/60 max-w-sm">
+            Start by adding your first todo using the form above. Stay organized
+            and productive!
+          </p>
         </div>
-        <h3 className="text-xl font-semibold text-base-content mb-2">
-          No todos yet
-        </h3>
-        <p className="text-base-content/60 max-w-sm">
-          Start by adding your first todo using the form on the left. Stay
-          organized and productive!
-        </p>
       </div>
     );
   }
@@ -74,38 +88,18 @@ export default function TodoList({
           </div>
         ))}
       </div>
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="card bg-base-100 shadow-sm w-full">
-          <div className="card-body flex flex-row items-center justify-between py-4">
-            <div className="text-sm text-base-content/70">
-              Page {currentPage} of {totalPages}
-            </div>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                className="btn btn-outline btn-sm"
-                onClick={() => onPageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                aria-label="Previous page"
-              >
-                <ChevronLeft className="h-4 w-4" />
-                Previous
-              </button>
-              <button
-                type="button"
-                className="btn btn-outline btn-sm"
-                onClick={() => onPageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                aria-label="Next page"
-              >
-                Next
-                <ChevronRight className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Todo Form */}
+      <div className="mt-8">
+        <TodoForm
+          todo={todo}
+          setTodo={setTodo}
+          tags={tags}
+          setTags={setTags}
+          isEditing={isEditing}
+          onSubmit={onSubmit}
+          onCancel={onCancel}
+        />
+      </div>
     </div>
   );
 }

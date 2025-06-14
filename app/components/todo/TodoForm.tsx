@@ -28,7 +28,7 @@ export default function TodoForm({
   onCancel,
 }: TodoFormProps) {
   return (
-    <div className="card bg-base-100 shadow-xl p-6">
+    <div className="border p-2">
       <form onSubmit={onSubmit}>
         <div className="flex flex-col">
           <MinimalInput
@@ -91,12 +91,12 @@ export default function TodoForm({
             }}
           />
         </div>
-        <div className="flex gap-3 pt-2">
+        <div className="flex justify-end gap-3 pt-2">
           <button
             type="submit"
             className={`btn ${
               isEditing ? "btn-primary" : "btn-success"
-            } flex-1 text-white`}
+            } text-white`}
           >
             {isEditing ? "Update Task" : "Add Task"}
           </button>

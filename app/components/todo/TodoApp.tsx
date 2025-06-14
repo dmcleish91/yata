@@ -1,8 +1,8 @@
-import React, { useEffect } from 'react';
-import TodoList from './TodoList';
-import TodoForm from './TodoForm';
-import { useTodos } from '~/hooks/useTodos';
-import type { Todo } from '~/types/todo';
+import React, { useEffect } from "react";
+import TodoList from "./TodoList";
+import TodoForm from "./TodoForm";
+import { useTodos } from "~/hooks/useTodos";
+import type { Todo } from "~/types/todo";
 
 const itemsPerPage = 4;
 
@@ -47,10 +47,10 @@ export default function TodoApp() {
   }
 
   return (
-    <main className='flex items-center justify-center min-h-screen bg-base-200 p-4'>
-      <div className='flex flex-col gap-8 w-full max-w-6xl'>
+    <main className="w-3/5 flex min-h-screen bg-base-200 p-4">
+      <div className="flex flex-col gap-8 w-full max-w-6xl">
         {/* Form Card */}
-        <div className='w-full'>
+        <div className="w-full">
           <TodoForm
             todo={todo}
             setTodo={setTodo}
@@ -62,8 +62,8 @@ export default function TodoApp() {
           />
         </div>
         {/* Todo List Card */}
-        <div className='w-full'>
-          <div className='card bg-base-100 shadow-xl p-6'>
+        <div className="w-full">
+          <div className="p-6 border-2 mx-auto">
             <TodoList
               todos={currentTodos}
               onToggle={handleToggleTodo}

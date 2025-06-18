@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo } from 'react';
 import { toast } from 'sonner';
 import useSWR, { mutate } from 'swr';
-import { createResource, deleteResource, editResource, fetchData } from '~/libs/httpMethods';
+import { createResource, deleteResource, editResource, fetchData, HttpMethod } from '~/libs/httpMethods';
 import { handleError } from '~/libs/handleError';
 import { Priority } from '~/types/task';
 import type { Task, NewTask } from '~/types/task';
@@ -35,6 +35,7 @@ export function useTasks() {
         toast.error('Task content is required');
         return;
       }
+      // TODO: Refactor this the backend should be able to insert null values. This is overkill
       const payload: Record<string, unknown> = {
         content: task.content,
         description: task.description,
@@ -51,13 +52,13 @@ export function useTasks() {
         is_completed: false,
         completed_at: null,
       } as Task;
-      mutate(APIEndpoints.TASKS, [optimisticNewTask, ...tasks], false);
+      mutate(APIEndpoints.TASKS, [...tasks, optimisticNewTask], false);
       try {
         const response = await createResource<typeof payload, Task>(APIEndpoints.TASKS, payload);
         const createdTask = response.data;
         mutate(
           APIEndpoints.TASKS,
-          (currentTasks: Task[] = []) => [createdTask, ...currentTasks.filter((t) => t.task_id !== optimisticNewTask.task_id)],
+          (currentTasks: Task[] = []) => [...currentTasks.filter((t) => t.task_id !== optimisticNewTask.task_id), createdTask],
           false
         );
         toast.success('Task successfully added');
@@ -98,22 +99,23 @@ export function useTasks() {
         parent_task_id: task.parent_task_id || undefined,
         project_id: task.project_id || undefined,
       };
+
       setTask(getDefaultTask());
       const previousTasks = tasks;
       const optimisticUpdatedTasks = tasks.map((t) => (t.task_id === editTaskID ? { ...t, ...payload } : t));
-      mutate(APIEndpoints.TASKS, optimisticUpdatedTasks, false);
+      mutate(APIEndpoints.EDIT_TASKS, optimisticUpdatedTasks, false);
       try {
-        const response = await editResource<typeof payload, Task>(APIEndpoints.EDIT_TASKS, payload);
+        const response = await editResource<typeof payload, Task>(APIEndpoints.EDIT_TASKS, payload, HttpMethod.PUT);
         const updatedTask = response.data;
         mutate(
-          APIEndpoints.TASKS,
+          APIEndpoints.EDIT_TASKS,
           (currentTasks: Task[] = []) => currentTasks.map((t) => (t.task_id === updatedTask.task_id ? updatedTask : t)),
           false
         );
         setEditTaskID(null);
         toast.success('Task successfully edited');
       } catch (error) {
-        mutate(APIEndpoints.TASKS, previousTasks, false);
+        mutate(APIEndpoints.EDIT_TASKS, previousTasks, false);
         setTask({ ...task, ...payload });
         handleError(error);
         toast.error('Failed to edit task. Please try again.');

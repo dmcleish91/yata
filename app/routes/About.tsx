@@ -7,9 +7,8 @@ export default function About() {
           <div className='flex-1'>
             <h1 className='text-4xl font-bold mb-4'>To do or not to do?</h1>
             <p className='text-lg text-gray-600'>
-              Manage your tasks effortlessly with our feature-packed Todo App. Built with
-              modern technologies, it’s designed to enhance your productivity and
-              collaboration.
+              Manage your tasks effortlessly with our feature-packed Todo App. Built with modern technologies, it’s designed to enhance your
+              productivity and collaboration.
             </p>
           </div>
 

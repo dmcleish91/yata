@@ -1,10 +1,6 @@
 import { useState, createContext, useContext, type ReactNode, useEffect } from 'react';
 import type { AuthError, User } from '~/types/auth';
-import {
-  createClient,
-  type Session,
-  type AuthError as SupabaseAuthError,
-} from '@supabase/supabase-js';
+import { createClient, type Session, type AuthError as SupabaseAuthError } from '@supabase/supabase-js';
 import ax from '../client';
 import { env } from '../../../src/config/env';
 
@@ -120,19 +116,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  return (
-    <AuthContext.Provider
-      value={{ user, setUser, error, isLoading, signInWithMagicLink, signOut }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={{ user, setUser, error, isLoading, signInWithMagicLink, signOut }}>{children}</AuthContext.Provider>;
 }
 
 // utility function to make using context easier in components
 export function useAuth() {
   const currentAuthContext = useContext(AuthContext);
   if (!currentAuthContext) {
-    throw new Error('useAuth must be used within <AuthContext.Provider>');
+    throw new Error(
+      'Authentication context is unavailable. ' +
+        'This usually means you are trying to use the useAuth() hook outside of an <AuthProvider>. ' +
+        'Please ensure your component is wrapped in <AuthProvider> at a higher level in the component tree.'
+    );
   }
   return currentAuthContext;
 }

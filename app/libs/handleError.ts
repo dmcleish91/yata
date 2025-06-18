@@ -1,11 +1,12 @@
 import { isAxiosError } from './typeGuards';
 
-export function handleError(error: unknown) {
+export function handleError(error: unknown, context?: string) {
+  const prefix = context ? `[${context}] ` : '';
   if (isAxiosError(error)) {
-    console.error('Axios error:', error.response?.data || error.message);
+    console.error(`${prefix}Axios error:`, error.response?.data || error.message);
   } else if (error instanceof Error) {
-    console.error('Error:', error.message);
+    console.error(`${prefix}Error:`, error.message);
   } else {
-    console.error('An unknown error occurred.');
+    console.error(`${prefix}An unknown error occurred.`);
   }
 }

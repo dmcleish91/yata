@@ -1,5 +1,1 @@
-import TodoApp from './todo/TodoApp';
-
-export default function App() {
-  return <TodoApp />;
-}
+// TODO: Replace with main Task component or dashboard

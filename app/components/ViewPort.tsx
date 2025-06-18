@@ -1,4 +1,4 @@
-import { type ReactNode } from "react";
+import { type ReactNode } from 'react';
 
 interface ViewPortProps {
   children: ReactNode;
@@ -11,9 +11,5 @@ interface ViewPortProps {
  * @returns {React.ReactElement} A wrapped viewport container
  */
 export function ViewPort({ children }: ViewPortProps): React.ReactElement {
-  return (
-    <div className="flex items-center bg-base-300 w-full h-full border-8 border-base-300 box-border overflow-hidden">
-      {children}
-    </div>
-  );
+  return <div className='flex items-center bg-base-300 w-full h-full border-8 border-base-300 box-border overflow-hidden'>{children}</div>;
 }

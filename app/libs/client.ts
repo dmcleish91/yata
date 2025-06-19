@@ -1,7 +1,7 @@
-import axios from 'axios';
-import { handleError } from './handleError';
-import { APIEndpoints } from '~/constants/api';
-import { env } from '../../src/config/env';
+import axios from "axios";
+import { handleError } from "./handleError";
+import { APIEndpoints } from "~/constants/api";
+import { env } from "../../src/config/env";
 
 let authToken: string | null = null;
 
@@ -13,9 +13,9 @@ const ax = axios.create({
 export const setAccessToken = (token: string | null) => {
   authToken = token;
   if (token) {
-    ax.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    ax.defaults.headers.common["Authorization"] = `Bearer ${token}`;
   } else {
-    delete ax.defaults.headers.common['Authorization'];
+    delete ax.defaults.headers.common["Authorization"];
   }
 };
 

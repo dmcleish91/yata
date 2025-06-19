@@ -1,12 +1,15 @@
-import type { Route } from '../+types/root';
-import { ViewPort } from '~/components/ViewPort';
-import TaskList from '~/components/task/TaskList';
-import { useTasks } from '~/hooks/useTasks';
-import type { Task } from '~/types/task';
-import { useCallback } from 'react';
+import type { Route } from "../+types/root";
+import { ViewPort } from "~/components/ViewPort";
+import TaskList from "~/components/task/TaskList";
+import { useTasks } from "~/hooks/useTasks";
+import type { Task } from "~/types/task";
+import { useCallback } from "react";
 
 export function meta({}: Route.MetaArgs) {
-  return [{ title: 'YATA' }, { name: 'description', content: 'Welcome to Yet Another Todo App!' }];
+  return [
+    { title: "YATA" },
+    { name: "description", content: "Welcome to Yet Another Todo App!" },
+  ];
 }
 
 export default function Home() {
@@ -29,7 +32,7 @@ export default function Home() {
         prepareEditTask(task.task_id);
       }
     },
-    [prepareEditTask]
+    [prepareEditTask],
   );
 
   return (

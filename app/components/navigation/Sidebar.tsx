@@ -1,8 +1,17 @@
-import { Link, useLocation, useNavigate } from 'react-router';
-import { useAuth } from '~/libs/auth/AuthContext';
-import { Home, Inbox, Calendar, Clock, Info, LogOut, LogIn, PanelRight } from 'lucide-react';
-import { handleError } from '~/libs/handleError';
-import { useCallback } from 'react';
+import { Link, useLocation, useNavigate } from "react-router";
+import { useAuth } from "~/libs/auth/AuthContext";
+import {
+  Home,
+  Inbox,
+  Calendar,
+  Clock,
+  Info,
+  LogOut,
+  LogIn,
+  PanelRight,
+} from "lucide-react";
+import { handleError } from "~/libs/handleError";
+import { useCallback } from "react";
 
 interface SidebarProps {
   collapsed: boolean;
@@ -29,7 +38,7 @@ export default function Sidebar({ collapsed, setCollapsed }: SidebarProps) {
     (path: string): boolean => {
       return location.pathname === path;
     },
-    [location.pathname]
+    [location.pathname],
   );
 
   /**
@@ -38,7 +47,7 @@ export default function Sidebar({ collapsed, setCollapsed }: SidebarProps) {
   const handleSignOut = useCallback(async (): Promise<void> => {
     try {
       await signOut();
-      navigate('/login');
+      navigate("/login");
     } catch (error) {
       handleError(error);
     }
@@ -48,69 +57,75 @@ export default function Sidebar({ collapsed, setCollapsed }: SidebarProps) {
     <>
       {/* Collapse Button (fixed, outside sidebar, only on sm and up) */}
       <button
-        type='button'
-        className={`hidden sm:block fixed top-4 left-0 z-50 btn btn-ghost btn-xs
-          ${collapsed ? 'sm:left-2' : 'sm:left-66'}
-        `}
-        aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        type="button"
+        className={`btn btn-ghost btn-xs fixed top-4 left-0 z-50 hidden sm:block ${collapsed ? "sm:left-2" : "sm:left-66"} `}
+        aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         tabIndex={0}
         onClick={handleToggleSidebar}
-        onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleToggleSidebar()}
-        style={{ transition: 'left 0s', minWidth: 0 }}>
-        <PanelRight className='w-4 h-4' />
+        onKeyDown={(e) =>
+          (e.key === "Enter" || e.key === " ") && handleToggleSidebar()
+        }
+        style={{ transition: "left 0s", minWidth: 0 }}
+      >
+        <PanelRight className="h-4 w-4" />
       </button>
       {/* Sidebar */}
       <div
-        className={`bg-base-300 min-h-screen flex flex-col
-          ${collapsed ? 'w-0 overflow-hidden flex-shrink-0' : 'min-w-64'}
-          ${collapsed ? 'shadow-lg' : ''}
-          ${collapsed ? '-translate-x-full' : 'translate-x-0'}
-        `}
-        aria-hidden={collapsed}>
+        className={`bg-base-300 flex min-h-screen flex-col ${collapsed ? "w-0 flex-shrink-0 overflow-hidden" : "min-w-64"} ${collapsed ? "shadow-lg" : ""} ${collapsed ? "-translate-x-full" : "translate-x-0"} `}
+        aria-hidden={collapsed}
+      >
         {/* Header */}
-        <div className='border-b border-base-300/50 relative'>
-          <div className='flex items-center justify-between p-4'>
-            <Link to='/' className='text-xl font-bold flex items-center gap-2' aria-label='Home' tabIndex={0}>
-              <Home className='h-5 w-5' />
+        <div className="border-base-300/50 relative border-b">
+          <div className="flex items-center justify-between p-4">
+            <Link
+              to="/"
+              className="flex items-center gap-2 text-xl font-bold"
+              aria-label="Home"
+              tabIndex={0}
+            >
+              <Home className="h-5 w-5" />
               YATA
             </Link>
           </div>
         </div>
         {/* Main Menu */}
-        <div className='flex-1 overflow-y-auto'>
-          <ul className='menu p-4 gap-2'>
+        <div className="flex-1 overflow-y-auto">
+          <ul className="menu gap-2 p-4">
             {user?.isLoggedIn && (
               <>
                 <li>
                   <Link
-                    to='/'
-                    className={`flex items-center gap-2 hover:bg-base-300/50 ${isActive('/') ? 'bg-base-300/50' : ''}`}
-                    aria-current={isActive('/') ? 'page' : undefined}
-                    aria-label='Inbox'
-                    tabIndex={0}>
-                    <Inbox className='h-5 w-5' />
+                    to="/"
+                    className={`hover:bg-base-300/50 flex items-center gap-2 ${isActive("/") ? "bg-base-300/50" : ""}`}
+                    aria-current={isActive("/") ? "page" : undefined}
+                    aria-label="Inbox"
+                    tabIndex={0}
+                  >
+                    <Inbox className="h-5 w-5" />
                     <span>Inbox</span>
                   </Link>
                 </li>
                 <li>
                   <Link
-                    to='/'
-                    className={`flex items-center gap-2 hover:bg-base-300/50 ${isActive('/') ? 'bg-base-300/50' : ''}`}
-                    aria-current={isActive('/') ? 'page' : undefined}
-                    aria-label='Today'
-                    tabIndex={0}>
-                    <Calendar className='h-5 w-5' />
+                    to="/"
+                    className={`hover:bg-base-300/50 flex items-center gap-2 ${isActive("/") ? "bg-base-300/50" : ""}`}
+                    aria-current={isActive("/") ? "page" : undefined}
+                    aria-label="Today"
+                    tabIndex={0}
+                  >
+                    <Calendar className="h-5 w-5" />
                     <span>Today</span>
                   </Link>
                 </li>
                 <li>
                   <Link
-                    to='/'
-                    className={`flex items-center gap-2 hover:bg-base-300/50 ${isActive('/') ? 'bg-base-300/50' : ''}`}
-                    aria-current={isActive('/') ? 'page' : undefined}
-                    aria-label='Upcoming'
-                    tabIndex={0}>
-                    <Clock className='h-5 w-5' />
+                    to="/"
+                    className={`hover:bg-base-300/50 flex items-center gap-2 ${isActive("/") ? "bg-base-300/50" : ""}`}
+                    aria-current={isActive("/") ? "page" : undefined}
+                    aria-label="Upcoming"
+                    tabIndex={0}
+                  >
+                    <Clock className="h-5 w-5" />
                     <span>Upcoming</span>
                   </Link>
                 </li>
@@ -120,23 +135,25 @@ export default function Sidebar({ collapsed, setCollapsed }: SidebarProps) {
               <>
                 <li>
                   <Link
-                    to='/about'
-                    className={`flex items-center gap-2 hover:bg-base-300/50 ${isActive('/about') ? 'bg-base-300/50' : ''}`}
-                    aria-current={isActive('/about') ? 'page' : undefined}
-                    aria-label='About'
-                    tabIndex={0}>
-                    <Info className='h-5 w-5' />
+                    to="/about"
+                    className={`hover:bg-base-300/50 flex items-center gap-2 ${isActive("/about") ? "bg-base-300/50" : ""}`}
+                    aria-current={isActive("/about") ? "page" : undefined}
+                    aria-label="About"
+                    tabIndex={0}
+                  >
+                    <Info className="h-5 w-5" />
                     <span>About</span>
                   </Link>
                 </li>
                 <li>
                   <Link
-                    to='/login'
-                    className={`flex items-center gap-2 hover:bg-base-300/50 ${isActive('/login') ? 'bg-base-300/50' : ''}`}
-                    aria-current={isActive('/login') ? 'page' : undefined}
-                    aria-label='Login'
-                    tabIndex={0}>
-                    <LogIn className='h-5 w-5' />
+                    to="/login"
+                    className={`hover:bg-base-300/50 flex items-center gap-2 ${isActive("/login") ? "bg-base-300/50" : ""}`}
+                    aria-current={isActive("/login") ? "page" : undefined}
+                    aria-label="Login"
+                    tabIndex={0}
+                  >
+                    <LogIn className="h-5 w-5" />
                     <span>Login</span>
                   </Link>
                 </li>
@@ -146,9 +163,14 @@ export default function Sidebar({ collapsed, setCollapsed }: SidebarProps) {
         </div>
         {/* Footer */}
         {user?.isLoggedIn && (
-          <div className='border-t border-base-300/50 p-4'>
-            <button onClick={handleSignOut} className='btn btn-ghost w-full flex items-center gap-2' aria-label='Logout' tabIndex={0}>
-              <LogOut className='h-5 w-5' />
+          <div className="border-base-300/50 border-t p-4">
+            <button
+              onClick={handleSignOut}
+              className="btn btn-ghost flex w-full items-center gap-2"
+              aria-label="Logout"
+              tabIndex={0}
+            >
+              <LogOut className="h-5 w-5" />
               <span>Logout</span>
             </button>
           </div>

@@ -1,34 +1,42 @@
-import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration, type LinksFunction } from 'react-router';
-import { useState } from 'react';
+import {
+  isRouteErrorResponse,
+  Links,
+  Meta,
+  Outlet,
+  Scripts,
+  ScrollRestoration,
+  type LinksFunction,
+} from "react-router";
+import { useState } from "react";
 
-import './app.css';
-import { Toaster } from 'sonner';
-import { AuthProvider } from './libs/auth/AuthContext';
-import Sidebar from './components/navigation/Sidebar';
+import "./app.css";
+import { Toaster } from "sonner";
+import { AuthProvider } from "./libs/auth/AuthContext";
+import Sidebar from "./components/navigation/Sidebar";
 
 export const links: LinksFunction = () => [
-  { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+  { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {
-    rel: 'preconnect',
-    href: 'https://fonts.gstatic.com',
-    crossOrigin: 'anonymous',
+    rel: "preconnect",
+    href: "https://fonts.gstatic.com",
+    crossOrigin: "anonymous",
   },
   {
-    rel: 'stylesheet',
-    href: 'https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap',
+    rel: "stylesheet",
+    href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
   },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang='en' className='h-full'>
+    <html lang="en" className="h-full">
       <head>
-        <meta charSet='utf-8' />
-        <meta name='viewport' content='width=device-width, initial-scale=1' />
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
       </head>
-      <body className='h-full flex flex-col'>
+      <body className="flex h-full flex-col">
         {children}
         <ScrollRestoration />
         <Scripts />
@@ -41,9 +49,12 @@ export default function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   return (
     <AuthProvider>
-      <div className='flex h-full'>
-        <Sidebar collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed} />
-        <main className='bg-base-300 flex-1'>
+      <div className="flex h-full">
+        <Sidebar
+          collapsed={sidebarCollapsed}
+          setCollapsed={setSidebarCollapsed}
+        />
+        <main className="bg-base-300 flex-1">
           <Outlet />
         </main>
       </div>
@@ -53,13 +64,16 @@ export default function App() {
 }
 
 export function ErrorBoundary({ error }: { error: unknown }) {
-  let message = 'Oops!';
-  let details = 'An unexpected error occurred.';
+  let message = "Oops!";
+  let details = "An unexpected error occurred.";
   let stack: string | undefined;
 
   if (isRouteErrorResponse(error)) {
-    message = error.status === 404 ? '404' : 'Error';
-    details = error.status === 404 ? 'The requested page could not be found.' : error.statusText || details;
+    message = error.status === 404 ? "404" : "Error";
+    details =
+      error.status === 404
+        ? "The requested page could not be found."
+        : error.statusText || details;
   } else if (import.meta.env.DEV && error && error instanceof Error) {
     details = error.message;
     stack = error.stack;
@@ -68,11 +82,11 @@ export function ErrorBoundary({ error }: { error: unknown }) {
   // TODO: send error to monitoring service in production
 
   return (
-    <main className='pt-16 p-4 container mx-auto' role='main'>
+    <main className="container mx-auto p-4 pt-16" role="main">
       <h1>{message}</h1>
       <p>{details}</p>
       {stack && (
-        <pre className='w-full p-4 overflow-x-auto'>
+        <pre className="w-full overflow-x-auto p-4">
           <code>{stack}</code>
         </pre>
       )}

@@ -1,10 +1,23 @@
-import { useState, createContext, useContext, type ReactNode, useEffect } from 'react';
-import type { AuthError, User } from '~/types/auth';
-import { createClient, type Session, type AuthError as SupabaseAuthError } from '@supabase/supabase-js';
-import ax from '../client';
-import { env } from '../../../src/config/env';
+import {
+  useState,
+  createContext,
+  useContext,
+  type ReactNode,
+  useEffect,
+} from "react";
+import type { AuthError, User } from "~/types/auth";
+import {
+  createClient,
+  type Session,
+  type AuthError as SupabaseAuthError,
+} from "@supabase/supabase-js";
+import ax from "../client";
+import { env } from "../../../src/config/env";
 
-export const supabase = createClient(env.VITE_SUPABASE_URL, env.VITE_SUPABASE_ANON_KEY);
+export const supabase = createClient(
+  env.VITE_SUPABASE_URL,
+  env.VITE_SUPABASE_ANON_KEY,
+);
 
 type AuthContextType = {
   user: User | null;
@@ -30,11 +43,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (session?.user) {
         const userData: User = {
           id: session.user.id,
-          email: session.user.email || '',
+          email: session.user.email || "",
           isLoggedIn: true,
         };
         setUser(userData);
-        ax.defaults.headers.common['Authorization'] = `Bearer ${session.access_token}`;
+        ax.defaults.headers.common["Authorization"] =
+          `Bearer ${session.access_token}`;
       }
       setIsLoading(false);
     });
@@ -48,16 +62,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (session?.user) {
         const userData: User = {
           id: session.user.id,
-          email: session.user.email || '',
+          email: session.user.email || "",
           isLoggedIn: true,
         };
         setUser(userData);
         // Set authorization header for your backend
-        ax.defaults.headers.common['Authorization'] = `Bearer ${session.access_token}`;
+        ax.defaults.headers.common["Authorization"] =
+          `Bearer ${session.access_token}`;
       } else {
         setUser(null);
         // Remove authorization header
-        delete ax.defaults.headers.common['Authorization'];
+        delete ax.defaults.headers.common["Authorization"];
       }
 
       setIsLoading(false);
@@ -82,7 +97,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (error) throw error;
 
       // Success - magic link sent
-      console.log('Magic link sent to', email);
+      console.log("Magic link sent to", email);
     } catch (err) {
       const supabaseError = err as SupabaseAuthError;
       setError({
@@ -103,7 +118,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       setUser(null);
       setSession(null);
-      delete ax.defaults.headers.common['Authorization'];
+      delete ax.defaults.headers.common["Authorization"];
     } catch (err) {
       const supabaseError = err as SupabaseAuthError;
       setError({
@@ -116,7 +131,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  return <AuthContext.Provider value={{ user, setUser, error, isLoading, signInWithMagicLink, signOut }}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider
+      value={{ user, setUser, error, isLoading, signInWithMagicLink, signOut }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
 // utility function to make using context easier in components
@@ -124,9 +145,9 @@ export function useAuth() {
   const currentAuthContext = useContext(AuthContext);
   if (!currentAuthContext) {
     throw new Error(
-      'Authentication context is unavailable. ' +
-        'This usually means you are trying to use the useAuth() hook outside of an <AuthProvider>. ' +
-        'Please ensure your component is wrapped in <AuthProvider> at a higher level in the component tree.'
+      "Authentication context is unavailable. " +
+        "This usually means you are trying to use the useAuth() hook outside of an <AuthProvider>. " +
+        "Please ensure your component is wrapped in <AuthProvider> at a higher level in the component tree.",
     );
   }
   return currentAuthContext;

@@ -11,7 +11,7 @@ export type Task = {
   parent_task_id?: string | null;
 };
 
-export type NewTask = Omit<Task, 'is_completed' | 'completed_at'>;
+export type NewTask = Omit<Task, "is_completed" | "completed_at">;
 
 export enum Priority {
   LOW = 1,

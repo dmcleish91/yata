@@ -1,4 +1,4 @@
-import { type ReactNode } from 'react';
+import { type ReactNode } from "react";
 
 interface ViewPortProps {
   children: ReactNode;
@@ -6,7 +6,7 @@ interface ViewPortProps {
 
 export function ViewPort({ children }: ViewPortProps): React.ReactElement {
   return (
-    <div className='flex items-center bg-base-200 w-full h-full border-8 border-base-300 rounded-2xl box-border overflow-hidden pl-2'>
+    <div className="bg-base-200 border-base-300 box-border flex h-full w-full items-center justify-center overflow-hidden rounded-2xl border-8">
       {children}
     </div>
   );

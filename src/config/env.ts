@@ -6,14 +6,18 @@ import { z } from "zod";
  */
 const envSchema = z.object({
   // Application Environment
-  VITE_NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
-  
+  VITE_NODE_ENV: z
+    .enum(["development", "production", "test"])
+    .default("development"),
+
   // Base URL Configuration
   VITE_BASEURL: z.string().url(),
-  
+
   // Supabase Configuration
   VITE_SUPABASE_URL: z.string().url(),
-  VITE_SUPABASE_ANON_KEY: z.string().min(1, "Supabase anonymous key is required"),
+  VITE_SUPABASE_ANON_KEY: z
+    .string()
+    .min(1, "Supabase anonymous key is required"),
 });
 
 /**
@@ -31,8 +35,12 @@ function validateEnv(): Env {
     return envSchema.parse(import.meta.env);
   } catch (error: unknown) {
     if (error instanceof z.ZodError) {
-      const missingVars = error.errors.map((err: z.ZodIssue) => err.path.join(".")).join(", ");
-      throw new Error(`Missing or invalid environment variables: ${missingVars}`);
+      const missingVars = error.errors
+        .map((err: z.ZodIssue) => err.path.join("."))
+        .join(", ");
+      throw new Error(
+        `Missing or invalid environment variables: ${missingVars}`,
+      );
     }
     throw error;
   }
@@ -42,4 +50,4 @@ function validateEnv(): Env {
  * Validated environment variables
  * This object will throw an error if any required environment variables are missing
  */
-export const env = validateEnv(); 
+export const env = validateEnv();

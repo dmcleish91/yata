@@ -1,4 +1,5 @@
 import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration, type LinksFunction } from 'react-router';
+import { useState } from 'react';
 
 import './app.css';
 import { Toaster } from 'sonner';
@@ -37,11 +38,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   return (
     <AuthProvider>
       <div className='flex h-full'>
-        <Sidebar />
-        <main className='flex-1 bg-base-300'>
+        <Sidebar collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed} />
+        <main className='bg-base-300 flex-1'>
           <Outlet />
         </main>
       </div>

@@ -17,7 +17,7 @@ export type TaskItemProps = {
 export default function TaskItem({ task, editTask, deleteTask, onToggle }: TaskItemProps) {
   return (
     <div
-      className='bg-base-100 shadow-sm w-full'
+      className='bg-base-100 shadow-sm w-96'
       tabIndex={0}
       aria-label={`Task: ${task.content}${task.description ? ', ' + task.description : ''}`}>
       <div className='p-3'>

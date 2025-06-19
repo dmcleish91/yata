@@ -48,7 +48,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const isWideScreen = useScreenWidth(700);
+  const isWideScreen = useScreenWidth(640);
 
   useEffect(() => {
     setSidebarCollapsed(!isWideScreen);

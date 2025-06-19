@@ -37,7 +37,7 @@ export default function TaskList({
   if (totalTasks === 0) {
     return (
       <div
-        className="flex h-full w-96 flex-col pt-16 text-center"
+        className="flex h-full w-full max-w-96 flex-col pt-16 text-center"
         aria-live="polite"
         aria-label="No tasks"
       >
@@ -61,7 +61,7 @@ export default function TaskList({
 
   return (
     <div
-      className="flex h-full w-96 max-w-full flex-col border pt-16 text-center"
+      className="flex h-full w-full max-w-96 flex-col pt-16 text-center"
       aria-label="Task List"
     >
       <div className="flex items-center justify-between">

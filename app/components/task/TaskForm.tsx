@@ -59,7 +59,6 @@ export default function TaskForm({
               icon={PlusIcon}
               onChange={(value) => setTask({ ...task, description: value })}
               value={task.description ?? ""}
-              required
             />
             <label htmlFor={dateId} className="sr-only">
               Due Date
@@ -85,9 +84,6 @@ export default function TaskForm({
             />
           </div>
           <div className="flex justify-end gap-3 pt-2">
-            <button type="submit" className="btn btn-primary text-white">
-              Update Task
-            </button>
             {onCancel && (
               <button
                 type="button"
@@ -97,6 +93,9 @@ export default function TaskForm({
                 <X className="h-4 w-4" /> Cancel
               </button>
             )}
+            <button type="submit" className="btn btn-primary text-white">
+              Update Task
+            </button>
           </div>
         </form>
       </div>
@@ -157,7 +156,6 @@ export default function TaskForm({
             icon={PlusIcon}
             onChange={(value) => setTask({ ...task, description: value })}
             value={task.description ?? ""}
-            required
           />
           <label htmlFor={dateId} className="sr-only">
             Due Date

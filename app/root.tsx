@@ -7,12 +7,13 @@ import {
   ScrollRestoration,
   type LinksFunction,
 } from "react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import "./app.css";
 import { Toaster } from "sonner";
 import { AuthProvider } from "./libs/auth/AuthContext";
 import Sidebar from "./components/navigation/Sidebar";
+import { useScreenWidth } from "./hooks/useScreenWidth";
 
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -47,6 +48,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const isWideScreen = useScreenWidth(700);
+
+  useEffect(() => {
+    setSidebarCollapsed(!isWideScreen);
+  }, [isWideScreen]);
+
   return (
     <AuthProvider>
       <div className="flex h-full">

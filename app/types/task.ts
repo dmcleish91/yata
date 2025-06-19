@@ -1,7 +1,6 @@
 export type Task = {
   task_id?: string;
   project_id?: string;
-  user_id?: string;
   content: string;
   description?: string | null;
   due_date?: string | null;

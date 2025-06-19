@@ -3,6 +3,7 @@ import { useAuth } from '~/libs/auth/AuthContext';
 import { Home, Inbox, Calendar, Clock, Info, LogOut, LogIn } from 'lucide-react';
 import { handleError } from '~/libs/handleError';
 import { useCallback } from 'react';
+import { logError } from '~/libs/logger';
 
 /**
  * Sidebar component that provides navigation and replaces the TopNavigation.

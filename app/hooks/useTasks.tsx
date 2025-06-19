@@ -35,15 +35,14 @@ export function useTasks() {
         toast.error('Task content is required');
         return;
       }
-      // TODO: Refactor this the backend should be able to insert null values. This is overkill
-      const payload: Record<string, unknown> = {
+
+      const payload: NewTask = {
+        project_id: undefined,
         content: task.content,
         description: task.description,
         priority: task.priority ?? Priority.LOW,
       };
-      if (task.project_id && task.project_id.trim() !== '') {
-        payload.project_id = task.project_id;
-      }
+
       setTask(getDefaultTask());
       const previousTasks = tasks;
       const optimisticNewTask: Task = {
@@ -203,9 +202,8 @@ export function useTasks() {
 // Helper to get the default task state
 function getDefaultTask(): Task {
   return {
-    task_id: '',
-    project_id: '',
-    user_id: '',
+    task_id: undefined,
+    project_id: undefined,
     content: '',
     description: '',
     due_date: '',

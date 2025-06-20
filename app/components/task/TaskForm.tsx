@@ -113,8 +113,8 @@ export default function TaskForm({
             setShowForm(true);
             // setTask({
             //   ...task,
-            //   due_date: getCurrentDate(),
-            //   date_datetime: getCurrentTime(),
+            //   due_date: getTodaysDateYYYYMMDD(),
+            //   due_datetime: getCurrentTimeHHMM(),
             // });
           }}
         >

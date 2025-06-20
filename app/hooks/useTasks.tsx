@@ -12,7 +12,15 @@ import { handleError } from "~/libs/handleError";
 import { Priority } from "~/types/task";
 import type { Task, NewTask } from "~/types/task";
 import { APIEndpoints } from "~/constants/api";
-import { formatDateToMMDDYYYY, formatTimeTo12Hour } from "~/libs/dateUtils";
+import {
+  combineTodayWithTime,
+  formatDateToISODate,
+  formatTimeToISOTime,
+  formatTimeToInput,
+  extractDateFromISO,
+  extractTimeFromISO,
+} from "~/libs/dateUtils";
+import { logInfo } from "~/libs/logger";
 
 /**
  * Custom hook for managing tasks. Provides CRUD operations, optimistic updates, and error handling for Task objects.
@@ -53,8 +61,16 @@ export function useTasks() {
         project_id: undefined,
         content: task.content,
         description: task.description,
+        due_date: task.due_date
+          ? new Date(task.due_date).toISOString()
+          : undefined,
+        due_datetime: task.due_datetime
+          ? combineTodayWithTime(task.due_datetime)
+          : undefined,
         priority: task.priority ?? Priority.LOW,
       };
+
+      logInfo("handleAddTask Payload:", payload);
 
       setTask(getDefaultTask());
       const previousTasks = tasks;
@@ -114,15 +130,17 @@ export function useTasks() {
         content: task.content,
         description: task.description || undefined,
         due_date: task.due_date
-          ? formatDateToMMDDYYYY(task.due_date)
+          ? new Date(task.due_date).toISOString()
           : undefined,
         due_datetime: task.due_datetime
-          ? formatTimeTo12Hour(task.due_datetime)
+          ? combineTodayWithTime(task.due_datetime)
           : undefined,
         priority: task.priority || Priority.LOW,
         parent_task_id: task.parent_task_id || undefined,
         project_id: task.project_id || undefined,
       };
+
+      logInfo("handleEditTask Payload:", payload);
 
       setTask(getDefaultTask());
       const previousTasks = tasks;
@@ -194,8 +212,12 @@ export function useTasks() {
         setEditTaskID(id);
         setTask({
           ...taskToEdit,
-          due_date: taskToEdit.due_date ?? "",
-          due_datetime: taskToEdit.due_datetime ?? "",
+          due_date: taskToEdit.due_date
+            ? extractDateFromISO(taskToEdit.due_date)
+            : "",
+          due_datetime: taskToEdit.due_datetime
+            ? extractTimeFromISO(taskToEdit.due_datetime)
+            : "",
           description: taskToEdit.description ?? "",
           priority: taskToEdit.priority ?? Priority.LOW,
           parent_task_id: taskToEdit.parent_task_id ?? null,

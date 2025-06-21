@@ -3,38 +3,24 @@ import TaskItem from "./TaskItem";
 import TaskForm from "./TaskForm";
 import type { Task, NewTask } from "~/types/task";
 import { Plus } from "lucide-react";
-
-/**
- * Props for the TaskList component.
- */
-export type TaskListProps = {
-  tasks: Task[];
-  onToggle: (id: string) => void;
-  onDelete: (id: string) => void;
-  totalTasks: number;
-  task: NewTask;
-  onSubmit: (task: NewTask) => void;
-  editingTaskId: string | null;
-  startEditingTask: (id: string) => void;
-  cancelEditingTask: () => void;
-  updateTask: (task: Task) => void;
-};
+import { useTasks } from "~/contexts/TaskContext";
 
 /**
  * TaskList component displays a list of tasks with empty state, using DaisyUI 5.
  */
-export default function TaskList({
-  tasks,
-  onToggle,
-  onDelete,
-  totalTasks,
-  task,
-  onSubmit,
-  editingTaskId,
-  startEditingTask,
-  cancelEditingTask,
-  updateTask,
-}: TaskListProps) {
+export default function TaskList() {
+  const {
+    tasks,
+    totalTasks,
+    task,
+    handleAddTask,
+    editingTaskId,
+    startEditingTask,
+    cancelEditingTask,
+    updateTask,
+    handleToggleTask,
+    handleDeleteTask,
+  } = useTasks();
   const [showAddTaskForm, setShowAddTaskForm] = useState(false);
 
   // Empty state
@@ -45,7 +31,7 @@ export default function TaskList({
         aria-live="polite"
         aria-label="No tasks"
       >
-        <TaskForm task={task} isEditing={false} onSubmit={onSubmit} />
+        <TaskForm task={task} isEditing={false} onSubmit={handleAddTask} />
         <div className="mt-4">
           <p className="max-w-sm">No tasks yet</p>
           <p className="text-base-content/60 max-w-sm">
@@ -71,7 +57,7 @@ export default function TaskList({
         </h2>
       </div>
       {/* Task items list */}
-      <ul className="space-y-4" aria-label="Task List">
+      <ul className="space-y-1" aria-label="Task List">
         {tasks.map((task, index) => {
           const isEditing = editingTaskId === task.task_id;
           return (
@@ -90,11 +76,11 @@ export default function TaskList({
               ) : (
                 <TaskItem
                   task={task}
-                  onToggle={onToggle}
+                  onToggle={handleToggleTask}
                   editTask={() =>
                     task.task_id && startEditingTask(task.task_id)
                   }
-                  deleteTask={onDelete}
+                  deleteTask={handleDeleteTask}
                 />
               )}
             </li>
@@ -108,7 +94,7 @@ export default function TaskList({
             task={task}
             isEditing={false}
             onSubmit={(newTask) => {
-              onSubmit(newTask as NewTask);
+              handleAddTask(newTask as NewTask);
               setShowAddTaskForm(false);
             }}
             onCancel={() => setShowAddTaskForm(false)}

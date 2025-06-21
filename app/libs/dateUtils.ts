@@ -178,8 +178,8 @@ export function extractTimeFromISO(isoString: string): string {
  */
 // Formats ISO 8601 date and time for display with smart formatting
 export function formatISO8601(
-  dueDate: string,
-  dueDateTime?: string | null,
+  dueDate: string | null | undefined,
+  dueDateTime?: string | null | undefined,
 ): string {
   if (!dueDate) return "";
 

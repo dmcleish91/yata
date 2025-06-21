@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router";
-import { useAuth } from "~/libs/auth/AuthContext";
+import { useAuth } from "~/contexts/AuthContext";
 import {
   Home,
   Inbox,

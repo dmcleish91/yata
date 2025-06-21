@@ -1,6 +1,6 @@
 import { Mail } from "lucide-react";
 import { useState } from "react";
-import { useAuth } from "~/libs/auth/AuthContext";
+import { useAuth } from "~/contexts/AuthContext";
 import { handleError } from "~/libs/handleError";
 import { ViewPort } from "~/components/ViewPort";
 import { logError } from "~/libs/logger";

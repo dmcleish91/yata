@@ -11,7 +11,7 @@ import { useEffect, useState } from "react";
 
 import "./app.css";
 import { Toaster } from "sonner";
-import { AuthProvider } from "./libs/auth/AuthContext";
+import { AuthProvider } from "./contexts/AuthContext";
 import Sidebar from "./components/navigation/Sidebar";
 import { useScreenWidth } from "./hooks/useScreenWidth";
 

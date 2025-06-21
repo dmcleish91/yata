@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Outlet, useNavigate } from "react-router";
 import { TaskProvider } from "~/contexts/TaskContext";
-import { useAuth } from "~/libs/auth/AuthContext";
+import { useAuth } from "~/contexts/AuthContext";
 
 export default function RequireAuth() {
   const navigate = useNavigate();

@@ -1,4 +1,5 @@
 import { Calendar, Pencil, Trash2 } from "lucide-react";
+import { useTasks } from "~/contexts/TaskContext";
 import { formatISO8601 } from "~/libs/dateUtils";
 import type { Task } from "~/types/task";
 
@@ -21,22 +22,27 @@ export default function TaskItem({
   deleteTask,
   onToggle,
 }: TaskItemProps) {
+  const { openModal } = useTasks();
+
   return (
     <div
-      className="bg-base-100 w-full shadow-sm"
+      className="w-full cursor-pointer"
       tabIndex={0}
       aria-label={`Task: ${task.content}${task.description ? ", " + task.description : ""}`}
+      onClick={() => openModal(task)}
     >
       <div className="p-3">
         <div className="flex gap-3">
           {/* Checkbox for completion */}
-          <input
-            type="checkbox"
-            className="checkbox checkbox-success checkbox-sm mt-0.5"
-            checked={!!task.is_completed}
-            onChange={() => task.task_id && onToggle(task.task_id)}
-            aria-label={`Mark "${task.content}" as ${task.is_completed ? "incomplete" : "complete"}`}
-          />
+          <div onClick={(e) => e.stopPropagation()}>
+            <input
+              type="checkbox"
+              className="checkbox checkbox-success checkbox-sm"
+              checked={!!task.is_completed}
+              onChange={() => task.task_id && onToggle(task.task_id)}
+              aria-label={`Mark "${task.content}" as ${task.is_completed ? "incomplete" : "complete"}`}
+            />
+          </div>
           {/* Main content */}
           <div className="min-w-0 flex-1">
             <div className="flex items-center justify-between gap-2">
@@ -45,7 +51,10 @@ export default function TaskItem({
               >
                 {task.content}
               </h3>
-              <div className="flex flex-shrink-0 items-center gap-1">
+              <div
+                className="flex flex-shrink-0 items-center gap-1"
+                onClick={(e) => e.stopPropagation()}
+              >
                 <button
                   type="button"
                   className="btn btn-ghost btn-xs"

@@ -39,6 +39,10 @@ type TaskContextType = {
   incompleteTasks: Task[];
   totalTasks: number;
   isEditing: boolean;
+  isModalOpen: boolean;
+  selectedTask: Task | null;
+  openModal: (task: Task) => void;
+  closeModal: () => void;
 };
 
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
@@ -51,7 +55,7 @@ function getDefaultTask(): Task {
   return {
     content: "",
     description: "",
-    priority: Priority.LOW,
+    priority: Priority.LOWEST,
     project_id: "",
     due_date: "",
     due_datetime: "",
@@ -68,6 +72,18 @@ export function TaskProvider({ children }: { children: ReactNode }) {
 
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [task, setTask] = useState<Task>(getDefaultTask());
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+
+  const openModal = useCallback((task: Task) => {
+    setSelectedTask(task);
+    setIsModalOpen(true);
+  }, []);
+
+  const closeModal = useCallback(() => {
+    setIsModalOpen(false);
+    setSelectedTask(null);
+  }, []);
 
   // Memoized Handlers
   const handleToggleTask = useCallback(
@@ -261,26 +277,55 @@ export function TaskProvider({ children }: { children: ReactNode }) {
 
   const totalTasks = tasks?.length || 0;
 
-  const value = {
-    tasks: tasks,
-    task,
-    setTask,
-    error,
-    isLoading,
-    editingTaskId,
-    startEditingTask,
-    cancelEditingTask,
-    updateTask,
-    handleToggleTask,
-    handleAddTask,
-    handleDeleteTask,
-    completedTasks,
-    incompleteTasks,
-    totalTasks,
-    isEditing: !!editingTaskId,
-  };
+  const contextValue = useMemo(
+    () => ({
+      tasks,
+      task,
+      setTask,
+      error,
+      isLoading,
+      editingTaskId,
+      startEditingTask,
+      cancelEditingTask,
+      updateTask,
+      handleToggleTask,
+      handleAddTask,
+      handleDeleteTask,
+      completedTasks,
+      incompleteTasks,
+      totalTasks,
+      isEditing: editingTaskId !== null,
+      isModalOpen,
+      selectedTask,
+      openModal,
+      closeModal,
+    }),
+    [
+      tasks,
+      task,
+      setTask,
+      error,
+      isLoading,
+      editingTaskId,
+      startEditingTask,
+      cancelEditingTask,
+      updateTask,
+      handleToggleTask,
+      handleAddTask,
+      handleDeleteTask,
+      completedTasks,
+      incompleteTasks,
+      totalTasks,
+      isModalOpen,
+      selectedTask,
+      openModal,
+      closeModal,
+    ],
+  );
 
-  return <TaskContext.Provider value={value}>{children}</TaskContext.Provider>;
+  return (
+    <TaskContext.Provider value={contextValue}>{children}</TaskContext.Provider>
+  );
 }
 
 // utility function to make using context easier in components

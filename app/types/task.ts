@@ -15,7 +15,9 @@ export type Task = {
 export type NewTask = Omit<Task, "is_completed" | "completed_at">;
 
 export enum Priority {
-  LOW = 1,
+  HIGHEST = 0,
+  HIGH = 1,
   MEDIUM = 2,
-  HIGH = 3,
+  LOW = 3,
+  LOWEST = 4,
 }

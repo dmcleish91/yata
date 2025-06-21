@@ -11,8 +11,8 @@ import {
   type Session,
   type AuthError as SupabaseAuthError,
 } from "@supabase/supabase-js";
-import ax from "../client";
-import { env } from "../../../src/config/env";
+import ax from "../libs/client";
+import { env } from "../../src/config/env";
 
 export const supabase = createClient(
   env.VITE_SUPABASE_URL,

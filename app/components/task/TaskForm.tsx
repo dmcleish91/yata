@@ -25,13 +25,7 @@ export default function TaskForm({
   onSubmit,
   onCancel,
 }: TaskFormProps) {
-  const [localTask, setLocalTask] = useState<NewTask | Task>({
-    ...task,
-    due_date: task.due_date ? extractDateFromISO(task.due_date) : "",
-    due_datetime: task.due_datetime
-      ? extractTimeFromISO(task.due_datetime)
-      : "",
-  });
+  const [localTask, setLocalTask] = useState<NewTask | Task>(task);
 
   useEffect(() => {
     if (isEditing) {
@@ -43,7 +37,7 @@ export default function TaskForm({
           : "",
       });
     } else {
-      setLocalTask({ ...task, due_date: getTodaysDateYYYYMMDD() });
+      setLocalTask({ ...task, due_date: "", due_datetime: "" });
     }
   }, [task, isEditing]);
 

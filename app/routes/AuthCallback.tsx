@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
-import { supabase } from "~/libs/auth/AuthContext";
+import { supabase } from "~/contexts/AuthContext";
 import { LoaderCircle } from "lucide-react";
 
 export default function AuthCallback() {

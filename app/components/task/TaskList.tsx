@@ -1,6 +1,8 @@
+import { useState } from "react";
 import TaskItem from "./TaskItem";
 import TaskForm from "./TaskForm";
 import type { Task, NewTask } from "~/types/task";
+import { Plus } from "lucide-react";
 
 /**
  * Props for the TaskList component.
@@ -8,14 +10,14 @@ import type { Task, NewTask } from "~/types/task";
 export type TaskListProps = {
   tasks: Task[];
   onToggle: (id: string) => void;
-  onEdit: (task: Task) => void;
   onDelete: (id: string) => void;
   totalTasks: number;
   task: NewTask;
-  setTask: (task: NewTask) => void;
-  isEditing: boolean;
-  onSubmit: (e: React.FormEvent) => void;
-  onCancel?: () => void;
+  onSubmit: (task: NewTask) => void;
+  editingTaskId: string | null;
+  startEditingTask: (id: string) => void;
+  cancelEditingTask: () => void;
+  updateTask: (task: Task) => void;
 };
 
 /**
@@ -24,15 +26,17 @@ export type TaskListProps = {
 export default function TaskList({
   tasks,
   onToggle,
-  onEdit,
   onDelete,
   totalTasks,
   task,
-  setTask,
-  isEditing,
   onSubmit,
-  onCancel,
+  editingTaskId,
+  startEditingTask,
+  cancelEditingTask,
+  updateTask,
 }: TaskListProps) {
+  const [showAddTaskForm, setShowAddTaskForm] = useState(false);
+
   // Empty state
   if (totalTasks === 0) {
     return (
@@ -41,13 +45,7 @@ export default function TaskList({
         aria-live="polite"
         aria-label="No tasks"
       >
-        <TaskForm
-          task={task}
-          setTask={setTask}
-          isEditing={isEditing}
-          onSubmit={onSubmit}
-          onCancel={onCancel}
-        />
+        <TaskForm task={task} isEditing={false} onSubmit={onSubmit} />
         <div className="mt-4">
           <p className="max-w-sm">No tasks yet</p>
           <p className="text-base-content/60 max-w-sm">
@@ -74,30 +72,56 @@ export default function TaskList({
       </div>
       {/* Task items list */}
       <ul className="space-y-4" aria-label="Task List">
-        {tasks.map((task, index) => (
-          <li
-            key={task.task_id}
-            className="animate-fade-in-right"
-            style={{ animationDelay: `${index * 50}ms` }}
-          >
-            <TaskItem
-              task={task}
-              onToggle={onToggle}
-              editTask={onEdit}
-              deleteTask={onDelete}
-            />
-          </li>
-        ))}
+        {tasks.map((task, index) => {
+          const isEditing = editingTaskId === task.task_id;
+          return (
+            <li
+              key={task.task_id}
+              className="animate-fade-in-right"
+              style={{ animationDelay: `${index * 50}ms` }}
+            >
+              {isEditing && task.task_id ? (
+                <TaskForm
+                  task={task}
+                  isEditing={true}
+                  onSubmit={updateTask}
+                  onCancel={cancelEditingTask}
+                />
+              ) : (
+                <TaskItem
+                  task={task}
+                  onToggle={onToggle}
+                  editTask={() =>
+                    task.task_id && startEditingTask(task.task_id)
+                  }
+                  deleteTask={onDelete}
+                />
+              )}
+            </li>
+          );
+        })}
       </ul>
       {/* Task Form */}
       <div className="mt-8">
-        <TaskForm
-          task={task}
-          setTask={setTask}
-          isEditing={isEditing}
-          onSubmit={onSubmit}
-          onCancel={onCancel}
-        />
+        {showAddTaskForm ? (
+          <TaskForm
+            task={task}
+            isEditing={false}
+            onSubmit={(newTask) => {
+              onSubmit(newTask as NewTask);
+              setShowAddTaskForm(false);
+            }}
+            onCancel={() => setShowAddTaskForm(false)}
+          />
+        ) : (
+          <button
+            type="button"
+            className="btn btn-success text-white"
+            onClick={() => setShowAddTaskForm(true)}
+          >
+            <Plus className="mr-2 h-4 w-4" /> Add New Task
+          </button>
+        )}
       </div>
     </div>
   );

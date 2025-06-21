@@ -12,14 +12,7 @@ import { handleError } from "~/libs/handleError";
 import { Priority } from "~/types/task";
 import type { Task, NewTask } from "~/types/task";
 import { APIEndpoints } from "~/constants/api";
-import {
-  combineTodayWithTime,
-  formatDateToISODate,
-  formatTimeToISOTime,
-  formatTimeToInput,
-  extractDateFromISO,
-  extractTimeFromISO,
-} from "~/libs/dateUtils";
+import { combineTodayWithTime } from "~/libs/dateUtils";
 import { logInfo } from "~/libs/logger";
 
 /**
@@ -34,51 +27,74 @@ export function useTasks() {
   } = useSWR(APIEndpoints.TASKS, fetchData<Task[]>);
   const tasks: Task[] = Array.isArray(tasksRaw) ? tasksRaw : [];
 
-  const [editTaskID, setEditTaskID] = useState<string | null>(null);
+  const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [task, setTask] = useState<Task>(getDefaultTask());
 
   // Memoized Handlers
-  const handleToggleTask = useCallback((id: string): void => {
-    mutate(
-      APIEndpoints.TASKS,
-      (currentTasks: Task[] = []) =>
-        currentTasks.map((t) =>
-          t.task_id === id ? { ...t, is_completed: !t.is_completed } : t,
-        ),
-      false,
-    );
-  }, []);
+  const handleToggleTask = useCallback(
+    async (id: string): Promise<void> => {
+      const previousTasks = tasks;
+      mutate(
+        APIEndpoints.TASKS,
+        (currentTasks: Task[] = []) =>
+          currentTasks.map((t) =>
+            t.task_id === id ? { ...t, is_completed: !t.is_completed } : t,
+          ),
+        false,
+      );
+
+      try {
+        const response = await editResource<Partial<Task>, Task>(
+          APIEndpoints.TOGGLE_TASK_COMPLETION(id),
+          {},
+          HttpMethod.PUT,
+        );
+        const updatedTask = response.data;
+
+        mutate(
+          APIEndpoints.TASKS,
+          (currentTasks: Task[] = []) =>
+            currentTasks.map((t) =>
+              t.task_id === updatedTask.task_id ? updatedTask : t,
+            ),
+          false,
+        );
+        toast.success("Task updated");
+      } catch (err) {
+        mutate(APIEndpoints.TASKS, previousTasks, false);
+        handleError(err);
+        toast.error("Failed to toggle task. Please try again.");
+      }
+    },
+    [tasks],
+  );
 
   const handleAddTask = useCallback(
-    async (e: React.FormEvent): Promise<void> => {
-      e.preventDefault();
-      if (!task.content.trim()) {
+    async (newTask: NewTask): Promise<void> => {
+      if (!newTask.content.trim()) {
         toast.error("Task content is required");
         return;
       }
 
       const payload: NewTask = {
-        project_id: undefined,
-        content: task.content,
-        description: task.description,
-        due_date: task.due_date
-          ? new Date(task.due_date).toISOString()
+        ...newTask,
+        due_date: newTask.due_date
+          ? new Date(newTask.due_date).toISOString()
           : undefined,
-        due_datetime: task.due_datetime
-          ? combineTodayWithTime(task.due_datetime)
+        due_datetime: newTask.due_datetime
+          ? combineTodayWithTime(newTask.due_datetime)
           : undefined,
-        priority: task.priority ?? Priority.LOW,
       };
 
       logInfo("handleAddTask Payload:", payload);
 
-      setTask(getDefaultTask());
       const previousTasks = tasks;
       const optimisticNewTask: Task = {
         ...payload,
         task_id: crypto.randomUUID(),
         is_completed: false,
         completed_at: null,
+        created_at: new Date().toISOString(),
       } as Task;
       mutate(APIEndpoints.TASKS, [...tasks, optimisticNewTask], false);
       try {
@@ -100,79 +116,66 @@ export function useTasks() {
         toast.success("Task successfully added");
       } catch (error) {
         mutate(APIEndpoints.TASKS, previousTasks, false);
-        setTask({
-          ...task,
-          content: payload.content as string,
-          description: payload.description as string,
-          priority: payload.priority as Priority,
-          project_id: (payload.project_id as string) || "",
-        });
         handleError(error);
         toast.error("Failed to add task. Please try again.");
       }
     },
-    [task, tasks],
+    [tasks],
   );
 
-  const handleEditTask = useCallback(
-    async (e: React.FormEvent): Promise<void> => {
-      e.preventDefault();
-      if (!editTaskID) {
-        toast.error("No task selected for editing");
+  const updateTask = useCallback(
+    async (taskToUpdate: Task): Promise<void> => {
+      if (!taskToUpdate.task_id) {
+        toast.error("Task ID is missing.");
         return;
       }
-      if (!task.content.trim()) {
+      if (!taskToUpdate.content.trim()) {
         toast.error("Task content is required");
         return;
       }
-      const payload: NewTask = {
-        task_id: editTaskID,
-        content: task.content,
-        description: task.description || undefined,
-        due_date: task.due_date
-          ? new Date(task.due_date).toISOString()
+
+      const payload: Task = {
+        ...taskToUpdate,
+        due_date: taskToUpdate.due_date
+          ? new Date(taskToUpdate.due_date).toISOString()
           : undefined,
-        due_datetime: task.due_datetime
-          ? combineTodayWithTime(task.due_datetime)
+        due_datetime: taskToUpdate.due_datetime
+          ? combineTodayWithTime(taskToUpdate.due_datetime)
           : undefined,
-        priority: task.priority || Priority.LOW,
-        parent_task_id: task.parent_task_id || undefined,
-        project_id: task.project_id || undefined,
       };
 
-      logInfo("handleEditTask Payload:", payload);
+      logInfo("updateTask Payload:", payload);
 
-      setTask(getDefaultTask());
       const previousTasks = tasks;
       const optimisticUpdatedTasks = tasks.map((t) =>
-        t.task_id === editTaskID ? { ...t, ...payload } : t,
+        t.task_id === payload.task_id ? payload : t,
       );
-      mutate(APIEndpoints.EDIT_TASKS, optimisticUpdatedTasks, false);
+      mutate(APIEndpoints.TASKS, optimisticUpdatedTasks, false);
+      setEditingTaskId(null);
+
       try {
-        const response = await editResource<typeof payload, Task>(
+        const response = await editResource<Task, Task>(
           APIEndpoints.EDIT_TASKS,
           payload,
           HttpMethod.PUT,
         );
         const updatedTask = response.data;
         mutate(
-          APIEndpoints.EDIT_TASKS,
+          APIEndpoints.TASKS,
           (currentTasks: Task[] = []) =>
             currentTasks.map((t) =>
               t.task_id === updatedTask.task_id ? updatedTask : t,
             ),
           false,
         );
-        setEditTaskID(null);
-        toast.success("Task successfully edited");
+        toast.success("Task successfully updated");
       } catch (error) {
-        mutate(APIEndpoints.EDIT_TASKS, previousTasks, false);
-        setTask({ ...task, ...payload });
+        mutate(APIEndpoints.TASKS, previousTasks, false);
         handleError(error);
-        toast.error("Failed to edit task. Please try again.");
+        toast.error("Failed to update task. Please try again.");
       }
     },
-    [editTaskID, task, tasks],
+    [tasks],
   );
 
   const handleDeleteTask = useCallback(
@@ -191,7 +194,6 @@ export function useTasks() {
         if (!wasSuccessful) {
           throw new Error("Failed to delete task");
         }
-        toast.success("Successfully deleted task");
       } catch (error) {
         mutate(APIEndpoints.TASKS, previousTasks, false);
         toast.error("Error deleting task. Please try again.");
@@ -200,78 +202,63 @@ export function useTasks() {
     [tasks],
   );
 
-  const clearEditAndResetTask = useCallback((): void => {
-    setEditTaskID(null);
-    setTask(getDefaultTask());
+  const cancelEditingTask = useCallback((): void => {
+    setEditingTaskId(null);
   }, []);
 
-  const prepareEditTask = useCallback(
-    (id: string): void => {
-      const taskToEdit = tasks.find((t) => t.task_id === id);
-      if (taskToEdit) {
-        setEditTaskID(id);
-        setTask({
-          ...taskToEdit,
-          due_date: taskToEdit.due_date
-            ? extractDateFromISO(taskToEdit.due_date)
-            : "",
-          due_datetime: taskToEdit.due_datetime
-            ? extractTimeFromISO(taskToEdit.due_datetime)
-            : "",
-          description: taskToEdit.description ?? "",
-          priority: taskToEdit.priority ?? Priority.LOW,
-          parent_task_id: taskToEdit.parent_task_id ?? null,
-        });
-      } else {
-        toast.error("Unable to edit task: Task not found.");
-      }
-    },
-    [tasks],
+  const startEditingTask = useCallback((id: string): void => {
+    setEditingTaskId(id);
+  }, []);
+
+  const sortedTasks = useMemo(() => {
+    if (!tasks) return [];
+    return tasks
+      .slice()
+      .sort((a, b) => (b.created_at || "").localeCompare(a.created_at || ""));
+  }, [tasks]);
+
+  const completedTasks = useMemo(
+    () => (sortedTasks ? sortedTasks.filter((task) => task.is_completed) : []),
+    [sortedTasks],
+  );
+  const incompleteTasks = useMemo(
+    () => (sortedTasks ? sortedTasks.filter((task) => !task.is_completed) : []),
+    [sortedTasks],
   );
 
-  // Memoize the returned object for stability
-  return useMemo(
-    () => ({
-      tasks,
-      error,
-      isLoading,
-      task,
-      editTaskID,
-      setTask,
-      handleToggleTask,
-      handleAddTask,
-      handleDeleteTask,
-      handleEditTask,
-      prepareEditTask,
-      clearEditAndResetTask,
-    }),
-    [
-      tasks,
-      error,
-      isLoading,
-      task,
-      editTaskID,
-      setTask,
-      handleToggleTask,
-      handleAddTask,
-      handleDeleteTask,
-      handleEditTask,
-      prepareEditTask,
-      clearEditAndResetTask,
-    ],
-  );
+  const totalTasks = tasks?.length || 0;
+
+  return {
+    tasks: sortedTasks,
+    task,
+    setTask,
+    error,
+    isLoading,
+    editingTaskId,
+    startEditingTask,
+    cancelEditingTask,
+    updateTask,
+    handleToggleTask,
+    handleAddTask,
+    handleDeleteTask,
+    completedTasks,
+    incompleteTasks,
+    totalTasks,
+    isEditing: !!editingTaskId,
+  };
 }
 
-// Helper to get the default task state
+/**
+ * Returns a default task object.
+ * @returns A default task object.
+ */
 function getDefaultTask(): Task {
   return {
-    task_id: undefined,
-    project_id: undefined,
     content: "",
     description: "",
+    priority: Priority.LOW,
+    project_id: "",
     due_date: "",
     due_datetime: "",
-    priority: Priority.LOW,
-    parent_task_id: null,
   };
 }

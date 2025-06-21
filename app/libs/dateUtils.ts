@@ -238,17 +238,22 @@ export function formatISO8601(
   // Add time if provided
   if (dueDateTime) {
     let timeString = "";
+    let timeToFormat = dueDateTime;
+
+    if (dueDateTime.includes("T")) {
+      timeToFormat = extractTimeFromISO(dueDateTime);
+    }
 
     // Check if time ends in ":00"
-    if (dueDateTime.endsWith(":00")) {
-      const [hourStr] = dueDateTime.split(":");
+    if (timeToFormat.endsWith(":00")) {
+      const [hourStr] = timeToFormat.split(":");
       const hour = parseInt(hourStr, 10);
       const ampm = hour >= 12 ? "PM" : "AM";
       const displayHour = hour % 12 || 12;
       timeString = `${displayHour} ${ampm}`;
     } else {
       // Use existing formatTimeToAMPM for other times
-      timeString = formatTimeToAMPM(dueDateTime);
+      timeString = formatTimeToAMPM(timeToFormat);
     }
 
     if (timeString) {

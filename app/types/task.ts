@@ -9,6 +9,7 @@ export type Task = {
   is_completed?: boolean | null;
   completed_at?: string | null;
   parent_task_id?: string | null;
+  created_at?: string;
 };
 
 export type NewTask = Omit<Task, "is_completed" | "completed_at">;

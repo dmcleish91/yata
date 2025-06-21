@@ -1,4 +1,5 @@
-import { Pencil, Trash2 } from "lucide-react";
+import { Calendar, Pencil, Trash2 } from "lucide-react";
+import { formatISO8601 } from "~/libs/dateUtils";
 import type { Task } from "~/types/task";
 
 /**
@@ -7,7 +8,7 @@ import type { Task } from "~/types/task";
 export type TaskItemProps = {
   task: Task;
   onToggle: (id: string) => void;
-  editTask: (task: Task) => void;
+  editTask: () => void;
   deleteTask: (id: string) => void;
 };
 
@@ -48,7 +49,7 @@ export default function TaskItem({
                 <button
                   type="button"
                   className="btn btn-ghost btn-xs"
-                  onClick={() => editTask(task)}
+                  onClick={editTask}
                   aria-label={`Edit "${task.content}"`}
                 >
                   <Pencil className="h-3 w-3" />
@@ -70,6 +71,15 @@ export default function TaskItem({
               >
                 {task.description}
               </p>
+            )}
+            {/* Due Date */}
+            {task.due_date && (
+              <div
+                className={`mt-1 flex items-center gap-1.5 text-left text-xs leading-relaxed ${task.is_completed ? "text-base-content/40" : "text-base-content/70"}`}
+              >
+                <Calendar className="h-3 w-3" />
+                <span>{formatISO8601(task.due_date, task.due_datetime)}</span>
+              </div>
             )}
           </div>
         </div>

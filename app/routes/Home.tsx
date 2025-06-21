@@ -20,34 +20,26 @@ export default function Home() {
     handleToggleTask,
     handleAddTask,
     handleDeleteTask,
-    handleEditTask,
-    clearEditAndResetTask,
-    editTaskID,
-    prepareEditTask,
+    updateTask,
+    cancelEditingTask,
+    editingTaskId,
+    startEditingTask,
+    totalTasks,
   } = useTasks();
-
-  const handleEdit = useCallback(
-    (task: Task) => {
-      if (task.task_id) {
-        prepareEditTask(task.task_id);
-      }
-    },
-    [prepareEditTask],
-  );
 
   return (
     <ViewPort>
       <TaskList
         tasks={tasks}
         task={task}
-        setTask={setTask}
         onToggle={handleToggleTask}
-        onEdit={handleEdit}
         onDelete={handleDeleteTask}
-        onSubmit={!!editTaskID ? handleEditTask : handleAddTask}
-        onCancel={clearEditAndResetTask}
-        isEditing={!!editTaskID}
-        totalTasks={tasks.length}
+        onSubmit={handleAddTask}
+        totalTasks={totalTasks}
+        editingTaskId={editingTaskId}
+        startEditingTask={startEditingTask}
+        cancelEditingTask={cancelEditingTask}
+        updateTask={updateTask}
       />
     </ViewPort>
   );

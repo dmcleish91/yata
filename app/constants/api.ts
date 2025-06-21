@@ -9,4 +9,5 @@ export const APIEndpoints = {
   EDIT_TASKS: "/v1/tasks",
   GET_TASKS: "/v1/tasks",
   DELETE_TASKS: (id: string) => `/v1/tasks?task_id=${id}`,
+  TOGGLE_TASK_COMPLETION: (id: string) => `/v1/tasks/${id}/toggle-completion`,
 };

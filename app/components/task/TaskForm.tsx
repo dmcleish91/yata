@@ -1,14 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Plus, X, CalendarDays, PlusIcon, Clock } from "lucide-react";
 import { toast } from "sonner";
-import type { NewTask } from "~/types/task";
+import type { Task, NewTask } from "~/types/task";
 import MinimalInput from "~/components/ui/MinimalInput";
+import {
+  extractDateFromISO,
+  extractTimeFromISO,
+  getTodaysDateYYYYMMDD,
+} from "~/libs/dateUtils";
 
 interface TaskFormProps {
-  task: NewTask;
-  setTask: (task: NewTask) => void;
+  task: NewTask | Task;
   isEditing: boolean;
-  onSubmit: (e: React.FormEvent) => void;
+  onSubmit: (task: NewTask | Task) => void;
   onCancel?: () => void;
 }
 
@@ -18,121 +22,45 @@ interface TaskFormProps {
  */
 export default function TaskForm({
   task,
-  setTask,
   isEditing,
   onSubmit,
   onCancel,
 }: TaskFormProps) {
-  const [showForm, setShowForm] = useState<boolean>(false);
+  const [localTask, setLocalTask] = useState<NewTask | Task>({
+    ...task,
+    due_date: task.due_date ? extractDateFromISO(task.due_date) : "",
+    due_datetime: task.due_datetime
+      ? extractTimeFromISO(task.due_datetime)
+      : "",
+  });
 
-  // Generate unique IDs for accessibility
+  useEffect(() => {
+    if (isEditing) {
+      setLocalTask({
+        ...task,
+        due_date: task.due_date ? extractDateFromISO(task.due_date) : "",
+        due_datetime: task.due_datetime
+          ? extractTimeFromISO(task.due_datetime)
+          : "",
+      });
+    } else {
+      setLocalTask({ ...task, due_date: getTodaysDateYYYYMMDD() });
+    }
+  }, [task, isEditing]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit(localTask);
+  };
+
   const contentId = "task-content-input";
   const descId = "task-desc-input";
   const dateId = "task-date-input";
   const timeId = "task-time-input";
 
-  // If editing, always show the form
-  if (isEditing) {
-    return (
-      <div className="w-96 p-2">
-        <form onSubmit={onSubmit} aria-label="Task Form">
-          <div className="flex flex-col">
-            <label htmlFor={contentId} className="sr-only">
-              Task Content
-            </label>
-            <MinimalInput
-              id={contentId}
-              ariaLabel="Task Content"
-              placeholder="Add a Task"
-              icon={PlusIcon}
-              onChange={(value) => setTask({ ...task, content: value })}
-              value={task.content}
-              required
-            />
-            <label htmlFor={descId} className="sr-only">
-              Task Description
-            </label>
-            <MinimalInput
-              id={descId}
-              ariaLabel="Task Description"
-              placeholder="Enter description"
-              icon={PlusIcon}
-              onChange={(value) => setTask({ ...task, description: value })}
-              value={task.description ?? ""}
-            />
-            <label htmlFor={dateId} className="sr-only">
-              Due Date
-            </label>
-            <MinimalInput
-              id={dateId}
-              ariaLabel="Due Date"
-              type="date"
-              icon={CalendarDays}
-              onChange={(value) => setTask({ ...task, due_date: value })}
-              value={task.due_date ?? ""}
-            />
-            <label htmlFor={timeId} className="sr-only">
-              Due Time
-            </label>
-            <MinimalInput
-              id={timeId}
-              ariaLabel="Due Time"
-              type="time"
-              icon={Clock}
-              onChange={(value) => setTask({ ...task, due_datetime: value })}
-              value={task.due_datetime ?? ""}
-            />
-          </div>
-          <div className="flex justify-end gap-3 pt-2">
-            {onCancel && (
-              <button
-                type="button"
-                className="btn btn-outline btn-error flex items-center gap-1"
-                onClick={onCancel}
-              >
-                <X className="h-4 w-4" /> Cancel
-              </button>
-            )}
-            <button type="submit" className="btn btn-primary text-white">
-              Update Task
-            </button>
-          </div>
-        </form>
-      </div>
-    );
-  }
-
-  // If not editing, show either the button or the form
-  if (!showForm) {
-    return (
-      <div className="w-fit p-2">
-        <button
-          type="button"
-          className="btn btn-success text-white"
-          onClick={() => {
-            setShowForm(true);
-            // setTask({
-            //   ...task,
-            //   due_date: getTodaysDateYYYYMMDD(),
-            //   due_datetime: getCurrentTimeHHMM(),
-            // });
-          }}
-        >
-          <Plus className="mr-2 h-4 w-4" /> Add New Task
-        </button>
-      </div>
-    );
-  }
-
   return (
-    <div className="w-96 p-2">
-      <form
-        onSubmit={(e) => {
-          onSubmit(e);
-          setShowForm(false);
-        }}
-        aria-label="Task Form"
-      >
+    <div className="w-full max-w-96 p-2">
+      <form onSubmit={handleSubmit} aria-label="Task Form">
         <div className="flex flex-col">
           <label htmlFor={contentId} className="sr-only">
             Task Content
@@ -142,8 +70,8 @@ export default function TaskForm({
             ariaLabel="Task Content"
             placeholder="Add a Task"
             icon={PlusIcon}
-            onChange={(value) => setTask({ ...task, content: value })}
-            value={task.content}
+            onChange={(value) => setLocalTask({ ...localTask, content: value })}
+            value={localTask.content}
             required
           />
           <label htmlFor={descId} className="sr-only">
@@ -154,8 +82,10 @@ export default function TaskForm({
             ariaLabel="Task Description"
             placeholder="Enter description"
             icon={PlusIcon}
-            onChange={(value) => setTask({ ...task, description: value })}
-            value={task.description ?? ""}
+            onChange={(value) =>
+              setLocalTask({ ...localTask, description: value })
+            }
+            value={localTask.description ?? ""}
           />
           <label htmlFor={dateId} className="sr-only">
             Due Date
@@ -165,8 +95,10 @@ export default function TaskForm({
             ariaLabel="Due Date"
             type="date"
             icon={CalendarDays}
-            onChange={(value) => setTask({ ...task, due_date: value })}
-            value={task.due_date ?? ""}
+            onChange={(value) =>
+              setLocalTask({ ...localTask, due_date: value })
+            }
+            value={localTask.due_date ?? ""}
           />
           <label htmlFor={timeId} className="sr-only">
             Due Time
@@ -176,20 +108,27 @@ export default function TaskForm({
             ariaLabel="Due Time"
             type="time"
             icon={Clock}
-            onChange={(value) => setTask({ ...task, due_datetime: value })}
-            value={task.due_datetime ?? ""}
+            onChange={(value) =>
+              setLocalTask({ ...localTask, due_datetime: value })
+            }
+            value={localTask.due_datetime ?? ""}
           />
         </div>
         <div className="flex justify-end gap-3 pt-2">
+          {onCancel && (
+            <button
+              type="button"
+              className="btn btn-outline btn-error flex items-center gap-1"
+              onClick={onCancel}
+            >
+              <X className="h-4 w-4" /> Cancel
+            </button>
+          )}
           <button
-            type="button"
-            className="btn btn-outline btn-error flex items-center gap-1"
-            onClick={() => setShowForm(false)}
+            type="submit"
+            className={`btn ${isEditing ? "btn-primary" : "btn-success"} text-white`}
           >
-            <X className="h-4 w-4" /> Cancel
-          </button>
-          <button type="submit" className="btn btn-success text-white">
-            Add Task
+            {isEditing ? "Update Task" : "Add Task"}
           </button>
         </div>
       </form>

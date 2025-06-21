@@ -11,6 +11,7 @@ import {
 import { useTasks } from "~/contexts/TaskContext";
 import { useEffect, useState } from "react";
 import { formatISO8601 } from "~/libs/dateUtils";
+import SubTaskList from "./SubTaskList";
 
 export default function TaskModal() {
   const {
@@ -125,11 +126,10 @@ export default function TaskModal() {
                 />
               </div>
 
-              {/* Add Sub-task */}
-              <button className="btn btn-ghost h-auto justify-start p-0 text-gray-500 hover:text-gray-700">
-                <Plus className="mr-2 h-4 w-4" />
-                Add sub-task
-              </button>
+              {/* Sub-tasks */}
+              {selectedTask.task_id && (
+                <SubTaskList parentId={selectedTask.task_id} />
+              )}
             </div>
           </div>
 

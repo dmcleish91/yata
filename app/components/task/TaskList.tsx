@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import TaskItem from "./TaskItem";
 import TaskForm from "./TaskForm";
 import type { Task, NewTask } from "~/types/task";
@@ -11,7 +11,6 @@ import { useTasks } from "~/contexts/TaskContext";
 export default function TaskList() {
   const {
     tasks,
-    totalTasks,
     task,
     handleAddTask,
     editingTaskId,
@@ -23,8 +22,13 @@ export default function TaskList() {
   } = useTasks();
   const [showAddTaskForm, setShowAddTaskForm] = useState(false);
 
+  const { parentTasks, totalParentTasks } = useMemo(() => {
+    const parentTasks = tasks.filter((t) => !t.parent_task_id);
+    return { parentTasks, totalParentTasks: parentTasks.length };
+  }, [tasks]);
+
   // Empty state
-  if (totalTasks === 0) {
+  if (totalParentTasks === 0) {
     return (
       <div
         className="flex h-full w-full max-w-96 flex-col pt-16 text-center"
@@ -52,13 +56,13 @@ export default function TaskList() {
         <h2 className="text-base-content text-2xl font-bold">
           Your Tasks
           <span className="text-base-content/60 ml-2 text-sm font-normal">
-            ({totalTasks} total)
+            ({totalParentTasks} total)
           </span>
         </h2>
       </div>
       {/* Task items list */}
       <ul className="space-y-1" aria-label="Task List">
-        {tasks.map((task, index) => {
+        {parentTasks.map((task, index) => {
           const isEditing = editingTaskId === task.task_id;
           return (
             <li

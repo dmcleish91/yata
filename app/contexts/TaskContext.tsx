@@ -114,7 +114,6 @@ export function TaskProvider({ children }: { children: ReactNode }) {
             ),
           false,
         );
-        toast.success("Task updated");
       } catch (err) {
         mutate(APIEndpoints.TASKS, previousTasks, false);
         handleError(err);

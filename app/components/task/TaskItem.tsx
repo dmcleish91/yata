@@ -37,7 +37,7 @@ export default function TaskItem({
           <div onClick={(e) => e.stopPropagation()}>
             <input
               type="checkbox"
-              className="checkbox checkbox-success checkbox-sm"
+              className="checkbox checkbox-sm"
               checked={!!task.is_completed}
               onChange={() => task.task_id && onToggle(task.task_id)}
               aria-label={`Mark "${task.content}" as ${task.is_completed ? "incomplete" : "complete"}`}

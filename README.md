@@ -1,57 +1,90 @@
-# Todo App Checklist
+# Yata (Yet Another Todo App)
 
-## About This Project
+## Overview
 
-https://yata-delta.vercel.app/
+A simple Todo application built with React and TypeScript. This project provides a frontend for a todo application, allowing users to manage their tasks. It connects to a backend service for data management and uses Supabase for JWT-based authentication.
 
-Yet Another Todo App (YATA) was built to demonstrate clean and modern React application architecture.
+## Getting Started
 
-### Features of the Application
+### Prerequisites
 
-- Secure authentication using JWT access and refresh tokens.
-- Maintainable architecture built with TypeScript.
-- Modern React codebase following best practices.
-- UI with opportunistic updates for enhanced performance.
-- Mobile-friendly, responsive design.
+- **Node.js**: Version 20 or newer
+- **pnpm**: ([Installation Guide](https://pnpm.io/installation))
+- **Supabase Account**: For authentication and API keys. ([Supabase](https://supabase.com))
 
----
+### Setup
 
-Here's a checklist 🎯 of the exciting features we're working on to enhance your productivity and experience:
+1.  **Clone the repository**
 
----
+    ```bash
+    git clone <your-repository-url>
+    cd yata
+    ```
 
-## 🚀 Coming Soon Features
+2.  **Install dependencies**
 
-### 1. Core Task Management
+    ```bash
+    pnpm install
+    ```
 
-- [ ] Add, edit, and delete tasks.
-- [ ] Mark tasks as complete/incomplete.
-- [ ] Set due dates for tasks.
-- [ ] Assign priority levels (e.g., High, Medium, Low).
-- [ ] Categorize tasks with tags or labels.
-- [ ] Create recurring tasks (e.g., daily, weekly).
+3.  **Setup environment variables**
 
-### 2. UI/UX Improvements
+    Create a `.env` file in the root directory of the project. You can copy the example below and fill in your details.
 
-- [ ] Toggle between light and dark themes.
-- [ ] Reorder tasks via drag-and-drop.
-- [ ] Show a progress bar or percentage of completed tasks.
-- [ ] UI sounds for interactive feedback.
+    ```env
+    # .env file
 
-### 3. Search & Filters
+    # Base URL for the application
+    VITE_BASEURL=http://localhost:5173
 
-- [ ] Search for tasks by keyword.
-- [ ] Filter tasks by tag, priority, due date, or completion status.
+    # Supabase Configuration
+    VITE_SUPABASE_URL=your_supabase_url
+    VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+    ```
 
-### 4. Offline & Mobile Support
+### Running the Development Server
 
-- [ ] Use the app offline and sync when back online.
-- [ ] Mobile-friendly responsive design.
-- [ ] Installable as a Progressive Web App (PWA).
+To run the application in development mode:
 
----
+```bash
+pnpm dev
+```
 
-Stay tuned for updates and new feature rollouts!  
-We're building a better way to manage your tasks — one update at a time.
+The application should now be available at: `http://localhost:5173`
 
-🛠️ Built with ❤️ by Dwight
+### Building for Production
+
+To build the application for production:
+
+```bash
+pnpm build
+```
+
+The production-ready files will be in the `dist/` directory.
+
+## Folder Structure
+
+```text
+.
+├── app/                  # Main application source code
+│   ├── components/       # Reusable components
+│   ├── hooks/            # Custom React hooks
+│   ├── libs/             # Libraries and helper functions
+│   ├── routes/           # Application routes
+│   └── types/            # TypeScript type definitions
+├── public/               # Static assets
+├── src/                  # Additional source files
+│   └── config/           # Environment configuration
+├── package.json          # Project metadata and dependencies
+├── pnpm-lock.yaml        # Pnpm lock file
+├── tsconfig.json         # TypeScript configuration
+└── vite.config.ts        # Vite configuration
+```
+
+## Future Features / TODO
+
+- [ ] Add a comprehensive test suite (unit and integration tests).
+- [ ] Implement Storybook for component development and documentation.
+- [ ] Enhance input validation across forms.
+- [ ] Implement optimistic UI updates for a smoother user experience.
+- [ ] Refactor state management for better scalability.

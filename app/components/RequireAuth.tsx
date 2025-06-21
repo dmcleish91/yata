@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { Outlet, useNavigate } from "react-router";
+import { TaskProvider } from "~/contexts/TaskContext";
 import { useAuth } from "~/libs/auth/AuthContext";
 
 export default function RequireAuth() {
@@ -24,5 +25,9 @@ export default function RequireAuth() {
     return null;
   }
 
-  return <Outlet />;
+  return (
+    <TaskProvider>
+      <Outlet />
+    </TaskProvider>
+  );
 }

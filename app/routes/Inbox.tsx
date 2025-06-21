@@ -1,9 +1,7 @@
 import type { Route } from "../+types/root";
 import { ViewPort } from "~/components/ViewPort";
 import TaskList from "~/components/task/TaskList";
-import { useTasks } from "~/hooks/useTasks";
-import type { Task } from "~/types/task";
-import { useCallback } from "react";
+import { useTasks } from "~/contexts/TaskContext";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -16,7 +14,6 @@ export default function Home() {
   const {
     tasks,
     task,
-    setTask,
     handleToggleTask,
     handleAddTask,
     handleDeleteTask,

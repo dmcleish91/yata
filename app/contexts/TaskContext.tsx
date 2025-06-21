@@ -1,4 +1,11 @@
-import { useState, useCallback, useMemo } from "react";
+import {
+  useState,
+  createContext,
+  useContext,
+  type ReactNode,
+  useCallback,
+  useMemo,
+} from "react";
 import { toast } from "sonner";
 import useSWR, { mutate } from "swr";
 import {
@@ -15,11 +22,43 @@ import { APIEndpoints } from "~/constants/api";
 import { combineTodayWithTime } from "~/libs/dateUtils";
 import { logInfo } from "~/libs/logger";
 
+type TaskContextType = {
+  tasks: Task[];
+  task: Task;
+  setTask: (task: Task) => void;
+  error: unknown;
+  isLoading: boolean;
+  editingTaskId: string | null;
+  startEditingTask: (id: string) => void;
+  cancelEditingTask: () => void;
+  updateTask: (taskToUpdate: Task) => Promise<void>;
+  handleToggleTask: (id: string) => Promise<void>;
+  handleAddTask: (newTask: NewTask) => Promise<void>;
+  handleDeleteTask: (id: string) => Promise<void>;
+  completedTasks: Task[];
+  incompleteTasks: Task[];
+  totalTasks: number;
+  isEditing: boolean;
+};
+
+const TaskContext = createContext<TaskContextType | undefined>(undefined);
+
 /**
- * Custom hook for managing tasks. Provides CRUD operations, optimistic updates, and error handling for Task objects.
- * @returns Task management state and handlers
+ * Returns a default task object.
+ * @returns A default task object.
  */
-export function useTasks() {
+function getDefaultTask(): Task {
+  return {
+    content: "",
+    description: "",
+    priority: Priority.LOW,
+    project_id: "",
+    due_date: "",
+    due_datetime: "",
+  };
+}
+
+export function TaskProvider({ children }: { children: ReactNode }) {
   const {
     data: tasksRaw,
     error,
@@ -78,6 +117,7 @@ export function useTasks() {
 
       const payload: NewTask = {
         ...newTask,
+        project_id: newTask.project_id || undefined,
         due_date: newTask.due_date
           ? new Date(newTask.due_date).toISOString()
           : undefined,
@@ -210,26 +250,19 @@ export function useTasks() {
     setEditingTaskId(id);
   }, []);
 
-  const sortedTasks = useMemo(() => {
-    if (!tasks) return [];
-    return tasks
-      .slice()
-      .sort((a, b) => (b.created_at || "").localeCompare(a.created_at || ""));
-  }, [tasks]);
-
   const completedTasks = useMemo(
-    () => (sortedTasks ? sortedTasks.filter((task) => task.is_completed) : []),
-    [sortedTasks],
+    () => (tasks ? tasks.filter((task) => task.is_completed) : []),
+    [tasks],
   );
   const incompleteTasks = useMemo(
-    () => (sortedTasks ? sortedTasks.filter((task) => !task.is_completed) : []),
-    [sortedTasks],
+    () => (tasks ? tasks.filter((task) => !task.is_completed) : []),
+    [tasks],
   );
 
   const totalTasks = tasks?.length || 0;
 
-  return {
-    tasks: sortedTasks,
+  const value = {
+    tasks: tasks,
     task,
     setTask,
     error,
@@ -246,19 +279,19 @@ export function useTasks() {
     totalTasks,
     isEditing: !!editingTaskId,
   };
+
+  return <TaskContext.Provider value={value}>{children}</TaskContext.Provider>;
 }
 
-/**
- * Returns a default task object.
- * @returns A default task object.
- */
-function getDefaultTask(): Task {
-  return {
-    content: "",
-    description: "",
-    priority: Priority.LOW,
-    project_id: "",
-    due_date: "",
-    due_datetime: "",
-  };
+// utility function to make using context easier in components
+export function useTasks() {
+  const currentTaskContext = useContext(TaskContext);
+  if (!currentTaskContext) {
+    throw new Error(
+      "Task context is unavailable. " +
+        "This usually means you are trying to use the useTasks() hook outside of an <TaskProvider>. " +
+        "Please ensure your component is wrapped in <TaskProvider> at a higher level in the component tree.",
+    );
+  }
+  return currentTaskContext;
 }

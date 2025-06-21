@@ -163,7 +163,6 @@ export function extractTimeFromISO(isoString: string): string {
   if (!isoString) return "";
   const timePart = isoString.split("T")[1];
   if (!timePart) return "";
-  console.log(timePart);
   return timePart.slice(0, 5);
 }
 

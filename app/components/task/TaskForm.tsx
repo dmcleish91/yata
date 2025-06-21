@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Plus, X, CalendarDays, PlusIcon, Clock } from "lucide-react";
-import { toast } from "sonner";
+import { X, CalendarDays, PlusIcon, Clock } from "lucide-react";
 import type { Task, NewTask } from "~/types/task";
 import MinimalInput from "~/components/ui/MinimalInput";
 import {
